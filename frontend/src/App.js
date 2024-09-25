@@ -1,13 +1,17 @@
 import './App.css';
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Landing from './components/Landing';
-import Navbar from './components/Navbar';
+import AuctionList from './components/AuctionList';
+
 
 function App() {
   return (
-    <div>
-      <Navbar/>
-      <Landing/>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/auctions" element={<AuctionList />} />
+      </Routes>
+    </Router>
   );
 }
 

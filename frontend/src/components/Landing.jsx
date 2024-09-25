@@ -1,8 +1,19 @@
 import React from "react";
+import Navbar from "./Navbar";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+
 
 const Landing = () => {
+  const navigate = useNavigate(); 
+
+  const handleExploreClick = () => {
+    navigate("/auctions"); 
+  };
+
   return (
+    <>
+    <Navbar/>
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center">
       <motion.section
         initial={{ opacity: 0, y: -50 }}
@@ -19,6 +30,7 @@ const Landing = () => {
         <motion.button
           whileHover={{ scale: 1.1 }}
           className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold text-lg mt-4 mb-3 md:mt-6"
+          onClick={handleExploreClick}
         >
           Explore Auctions
         </motion.button>
@@ -84,6 +96,7 @@ const Landing = () => {
         </p>
       </footer>
     </div>
+    </>
   )
 }
 
