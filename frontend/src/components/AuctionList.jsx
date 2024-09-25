@@ -21,6 +21,24 @@ const auctions = [
     description: "A famous Picasso painting from his blue period.",
     price: "$100,000",
   },
+  {
+    id: 4,
+    title: "Vintage Car",
+    description: "A rare vintage car from 1920s.",
+    price: "$50,000",
+  },
+  {
+    id: 5,
+    title: "Antique Watch",
+    description: "Classic Rolex from 1950s.",
+    price: "$10,000",
+  },
+  {
+    id: 6,
+    title: "Painting by Picasso",
+    description: "A famous Picasso painting from his blue period.",
+    price: "$100,000",
+  },
 ];
 
 const AuctionList = () => {
