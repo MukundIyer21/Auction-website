@@ -23,11 +23,6 @@ async function main() {
     console.log("Contract address and ABI have been successfully updated.");
 }
 
-/**
- * Updates the .env file with the deployed contract address.
- * @param {string} envFilePath - Path to the .env file.
- * @param {string} contractAddress - The deployed contract address.
- */
 function updateEnvFile(envFilePath, contractAddress) {
     let envContent = "";
 
