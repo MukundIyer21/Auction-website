@@ -1,0 +1,10 @@
+node_modules
+package-lock.json
+.env
+artifacts
+cache
+tests/artifacts
+tests/cache
+tests/contracts
+tests/node_modules
+tests/package-lock.json
