@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "../server/.env" }); // Specify the .env file location
+require("dotenv").config({ path: "../server/.env" });
 const fs = require("fs");
 const path = require("path");
 const { ethers } = require("hardhat");

@@ -16,13 +16,6 @@ async function executeWithGasEstimate(methodName, params) {
         const gasLimit = estimatedGas.mul(ethers.BigNumber.from(12)).div(ethers.BigNumber.from(10));
         const finalGasPrice = currentGasPrice.mul(ethers.BigNumber.from(110)).div(ethers.BigNumber.from(100));
 
-        console.log('Gas Estimation:', {
-            estimatedGas: estimatedGas.toString(),
-            gasLimit: gasLimit.toString(),
-            currentGasPrice: ethers.utils.formatUnits(currentGasPrice, 'gwei') + ' gwei',
-            finalGasPrice: ethers.utils.formatUnits(finalGasPrice, 'gwei') + ' gwei'
-        });
-
         const tx = await contract[methodName](...params, {
             gasLimit: gasLimit,
             gasPrice: finalGasPrice
