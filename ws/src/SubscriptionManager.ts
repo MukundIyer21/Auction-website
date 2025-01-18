@@ -19,7 +19,7 @@ export class SubscriptionManager {
     return this.instance;
   }
 
-  public subscribe(userId: string, subscription: string) {
+  public async subscribe(userId: string, subscription: string) {
     if (this.subscriptions.get(userId)?.includes(subscription)) {
       return;
     }
@@ -27,16 +27,16 @@ export class SubscriptionManager {
     this.subscriptions.set(userId, (this.subscriptions.get(userId) || []).concat(subscription));
     this.reverseSubscriptions.set(subscription, (this.reverseSubscriptions.get(subscription) || []).concat(userId));
     if (this.reverseSubscriptions.get(subscription)?.length === 1) {
-      this.redisClient.subscribe(subscription, this.redisCallbackHandler);
+      await this.redisClient.subscribe(subscription, this.redisCallbackHandler);
     }
   }
 
-  private redisCallbackHandler = (message: string, channel: string) => {
+  private redisCallbackHandler = async (message: string, channel: string) => {
     const parsedMessage = JSON.parse(message);
     this.reverseSubscriptions.get(channel)?.forEach((s) => UserManager.getInstance().getUser(s)?.emit(parsedMessage));
   };
 
-  public unsubscribe(userId: string, subscription: string) {
+  public async unsubscribe(userId: string, subscription: string) {
     const subscriptions = this.subscriptions.get(userId);
     if (subscriptions) {
       this.subscriptions.set(
@@ -52,12 +52,12 @@ export class SubscriptionManager {
       );
       if (this.reverseSubscriptions.get(subscription)?.length === 0) {
         this.reverseSubscriptions.delete(subscription);
-        this.redisClient.unsubscribe(subscription);
+        await this.redisClient.unsubscribe(subscription);
       }
     }
   }
 
-  public userLeft(userId: string) {
+  public async userLeft(userId: string) {
     console.log(`User with user_id: ${userId} disconnected.`);
     this.subscriptions.get(userId)?.forEach((s) => this.unsubscribe(userId, s));
   }

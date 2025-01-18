@@ -18,11 +18,11 @@ export class User {
 
   private subscriptions: string[] = [];
 
-  public subscribe(subscription: string) {
+  public async subscribe(subscription: string) {
     this.subscriptions.push(subscription);
   }
 
-  public unsubscribe(subscription: string) {
+  public async unsubscribe(subscription: string) {
     this.subscriptions = this.subscriptions.filter((s) => s !== subscription);
   }
 
@@ -31,7 +31,7 @@ export class User {
   }
 
   private addListeners() {
-    this.ws.on("message", (message: string) => {
+    this.ws.on("message", async (message: string) => {
       const parsedMessage: IncomingMessage = JSON.parse(message);
       if (parsedMessage.method === SUBSCRIBE) {
         parsedMessage.params.forEach((s) => SubscriptionManager.getInstance().subscribe(this.id, s));

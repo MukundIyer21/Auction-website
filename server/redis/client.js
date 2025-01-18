@@ -7,7 +7,7 @@ const redis = new Redis({
 });
 
 const QUEUES = {
-    ITEM_OPERATIONS: 'item-operations',
+    ITEM_OPERATIONS: 'operations-messaging',
 };
 
 async function addToQueue(queue, data) {
