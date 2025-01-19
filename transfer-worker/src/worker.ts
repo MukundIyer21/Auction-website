@@ -1,5 +1,5 @@
 import { addJobWithCallback } from "./bull";
-import { checkIfItemIsSold, getLatestBids, updateItemStatusToTransferring, updateItemStatusToUnsold } from "./db";
+import { checkIfItemExists, checkIfItemIsSold, getLatestBids, updateItemStatusToTransferring, updateItemStatusToUnsold } from "./db";
 import { addItemToUserList, publish, removeItemFromUserList } from "./redis";
 import { transferQueueElement, Bid } from "./types";
 
@@ -15,6 +15,7 @@ class TransferWorker {
 
   public async process(dequedElement: transferQueueElement) {
     if (dequedElement?.type == 1) {
+      if (!(await checkIfItemExists(dequedElement.item_id))) return;
       await this.handleFirstBid(dequedElement);
     } else if (dequedElement?.type == 2) {
       if (await checkIfItemIsSold(dequedElement.item_id)) return;

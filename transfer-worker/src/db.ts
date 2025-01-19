@@ -53,4 +53,9 @@ async function checkIfItemIsSold(itemId: string): Promise<boolean> {
   return item.status === "sold";
 }
 
-export { checkIfItemIsSold, connectToDatabase, getLatestBids, updateItemStatusToUnsold, updateItemStatusToTransferring, BidModel, ItemModel };
+async function checkIfItemExists(itemId: string) {
+  const item = await ItemModel.findById(itemId);
+  return item != null;
+}
+
+export { checkIfItemExists, checkIfItemIsSold, connectToDatabase, getLatestBids, updateItemStatusToUnsold, updateItemStatusToTransferring, BidModel, ItemModel };
