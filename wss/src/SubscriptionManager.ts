@@ -1,6 +1,6 @@
 import { RedisClientType } from "redis";
 import { UserManager } from "./UserManager";
-import redisClient from "./redis";
+import { pubSubClient as redisClient } from "./redis";
 
 export class SubscriptionManager {
   private static instance: SubscriptionManager;
@@ -59,7 +59,7 @@ export class SubscriptionManager {
 
   public async userLeft(userId: string) {
     console.log(`User with user_id: ${userId} disconnected.`);
-    this.subscriptions.get(userId)?.forEach((s) => this.unsubscribe(userId, s));
+    this.subscriptions.get(userId)?.forEach(async (s) => await this.unsubscribe(userId, s));
   }
 
   getSubscriptions(userId: string) {

@@ -1,6 +1,7 @@
 import { addJobWithCallback } from "./bull";
-import { Bid, checkIfItemIsSold, getLatestBids, updateItemStatusToTransferring, updateItemStatusToUnsold } from "./db";
-import { addItemToUserList, publish, removeItemFromUserList, transferQueueElement } from "./redis";
+import { checkIfItemIsSold, getLatestBids, updateItemStatusToTransferring, updateItemStatusToUnsold } from "./db";
+import { addItemToUserList, publish, removeItemFromUserList } from "./redis";
+import { transferQueueElement, Bid } from "./types";
 
 class TransferWorker {
   private static instance: TransferWorker;
@@ -34,7 +35,7 @@ class TransferWorker {
     const { item_id, user_id, price, prev_user_id, item_name } = dequedElement?.type == 2 ? dequedElement : { item_id: "", user_id: "", price: "", prev_user_id: "", item_name: "" };
 
     await removeItemFromUserList(prev_user_id, item_id);
-    await addItemToUserList(user_id, item_id);
+    await addItemToUserList(user_id, { item_id, price, item_name });
     await publish("transfer", { item_id, user_id, price, item_name });
   }
 
@@ -45,7 +46,7 @@ class TransferWorker {
     if (latestFiveBids.length == 0) {
       return;
     }
-    await addItemToUserList(latestFiveBids[0].bidder, item_id);
+    await addItemToUserList(latestFiveBids[0].bidder, { item_id, price: latestFiveBids[0].bid_price, item_name });
     await publish("transfer", {
       item_id,
       user_id: latestFiveBids[0].bidder,
@@ -61,6 +62,7 @@ class TransferWorker {
     for (let i = 1; i < Math.min(latestFiveBids.length, 5); i++) {
       await addJobWithCallback(
         {
+          type: 2,
           item_id,
           item_name,
           user_id: latestFiveBids[i].bidder,
@@ -71,7 +73,7 @@ class TransferWorker {
       );
     }
     const lastValidBidIndex = Math.min(latestFiveBids.length, 5) - 1;
-    await addJobWithCallback({ item_id, prev_user_id: latestFiveBids[lastValidBidIndex].bidder }, FIVE_MINUTES * time_index);
+    await addJobWithCallback({ type: 3, item_id, prev_user_id: latestFiveBids[lastValidBidIndex].bidder }, FIVE_MINUTES * time_index);
   }
 
   private async handleDBStatus(latestFiveBids: Bid[], item_id: string) {

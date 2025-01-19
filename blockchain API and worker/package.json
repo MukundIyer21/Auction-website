@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "setup": "npm install",
-    "docker": "cd docker && docker-compose up -d",
     "server": "node server.js",
     "worker": "node worker/itemOperationWorker.js",
-    "start": "npm run setup && concurrently \"npm run docker\" \"npm run server\" \"npm run worker\"",
+    "start": "npm run setup && concurrently \"npm run server\" \"npm run worker\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

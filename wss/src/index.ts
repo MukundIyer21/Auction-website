@@ -1,6 +1,6 @@
 import { WebSocketServer } from "ws";
 import { UserManager } from "./UserManager";
-import redisClient from "./redis";
+import { pubSubClient as redisClient } from "./redis";
 
 const subscribeTransferChannel = async () => {
   await redisClient.subscribe("transfer", async (message) => {

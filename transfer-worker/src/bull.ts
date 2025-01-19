@@ -1,6 +1,7 @@
 import { Queue, Worker, Job } from "bullmq";
 import { bullmqConfig } from "./config";
 import { enqueue } from "./redis";
+import { transferQueueElement } from "./types";
 
 const queue = new Queue("transfer-scheduler", {
   connection: bullmqConfig.redis,
@@ -14,7 +15,7 @@ const JOBS = {
   transferJob: "transfer-job",
 };
 
-export async function addJobWithCallback(data: Record<string, any>, delay: number): Promise<void> {
+export async function addJobWithCallback(data: transferQueueElement, delay: number): Promise<void> {
   await queue.add(JOBS.transferJob, data, { delay });
 }
 

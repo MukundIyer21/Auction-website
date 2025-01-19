@@ -1,18 +1,6 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { mongoConfig } from "./config";
-
-export interface Bid extends Document {
-  bid_price: string;
-  bidder: string;
-  item_id: mongoose.Types.ObjectId;
-  timestamp: Date;
-}
-
-export interface Item extends Document {
-  details: object;
-  rating: string;
-  status: string;
-}
+import { Bid, Item } from "./types";
 
 const bidSchema = new Schema<Bid>({
   bid_price: { type: String, required: true },
