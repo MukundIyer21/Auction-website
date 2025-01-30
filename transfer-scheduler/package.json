@@ -1,26 +1,22 @@
 {
-  "name": "transfer-worker",
+  "name": "transfer-scheduler",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc -b",
-    "dev": "tsc -b && node dist/index.js",
+    "dev": "npm run build && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@types/axios": "^0.14.4",
-    "@types/mongoose": "^5.11.97",
-    "@types/nanoid": "^3.0.0",
+    "@types/express": "^5.0.0",
     "@types/redis": "^4.0.11",
-    "axios": "^1.7.9",
     "bullmq": "^5.34.10",
     "dotenv": "^16.4.7",
-    "mongoose": "^8.9.5",
-    "nanoid": "^5.0.9",
+    "express": "^4.21.2",
     "node": "^22.13.0",
     "redis": "^4.7.0"
   },

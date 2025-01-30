@@ -1,6 +1,6 @@
-import { addJobWithCallback } from "./bull";
+import { scheduleTransfer } from "./axios";
 import { checkIfItemExists, checkIfItemIsSold, getLatestBids, updateItemStatusToTransferring, updateItemStatusToUnsold } from "./db";
-import { addItemToUserList, publish, removeItemFromUserList } from "./redis";
+import { addItemToUserList, publish, removeItemFromSimilarItems, removeItemFromUserList } from "./redis";
 import { transferQueueElement, Bid } from "./types";
 
 class TransferWorker {
@@ -33,48 +33,50 @@ class TransferWorker {
   }
 
   private async handleReminingBids(dequedElement: transferQueueElement) {
-    const { item_id, user_id, price, prev_user_id, item_name } = dequedElement?.type == 2 ? dequedElement : { item_id: "", user_id: "", price: "", prev_user_id: "", item_name: "" };
+    const { item_id, user_id, price, prev_user_id, item_name, seller } =
+      dequedElement?.type == 2 ? dequedElement : { item_id: "", user_id: "", price: "", prev_user_id: "", item_name: "", seller: "" };
 
     await removeItemFromUserList(prev_user_id, item_id);
-    await addItemToUserList(user_id, { item_id, price, item_name });
-    await publish("transfer", { item_id, user_id, price, item_name });
+    await addItemToUserList(user_id, { item_id, price, item_name, seller });
+    await publish("transfer", { item_id, user_id, price, item_name, seller });
   }
 
   private async handleFirstBid(dequedElement: transferQueueElement) {
-    const { item_name, item_id } = dequedElement?.type == 1 ? dequedElement : { item_name: "", item_id: "" };
+    const { item_name, item_id, seller } = dequedElement?.type == 1 ? dequedElement : { item_name: "", item_id: "", seller: "" };
+    await removeItemFromSimilarItems(item_id);
     const latestFiveBids = await getLatestBids(item_id, 5);
     await this.handleDBStatus(latestFiveBids, item_id);
     if (latestFiveBids.length == 0) {
       return;
     }
-    await addItemToUserList(latestFiveBids[0].bidder, { item_id, price: latestFiveBids[0].bid_price, item_name });
+    await addItemToUserList(latestFiveBids[0].bidder, { item_id, price: latestFiveBids[0].bid_price, item_name, seller });
     await publish("transfer", {
       item_id,
       user_id: latestFiveBids[0].bidder,
       price: latestFiveBids[0].bid_price,
       item_name,
+      seller,
     });
-    await this.registerRemainingBids(latestFiveBids, item_id, item_name);
+    await this.registerRemainingBids(latestFiveBids, item_id, item_name, seller);
   }
 
-  private async registerRemainingBids(latestFiveBids: Bid[], item_id: string, item_name: string) {
+  private async registerRemainingBids(latestFiveBids: Bid[], item_id: string, item_name: string, seller: string) {
     const FIVE_MINUTES = 5 * 60 * 1000;
     let time_index = 1;
     for (let i = 1; i < Math.min(latestFiveBids.length, 5); i++) {
-      await addJobWithCallback(
-        {
-          type: 2,
-          item_id,
-          item_name,
-          user_id: latestFiveBids[i].bidder,
-          price: latestFiveBids[i].bid_price,
-          prev_user_id: latestFiveBids[i - 1].bidder,
-        },
-        FIVE_MINUTES * time_index++
-      );
+      await scheduleTransfer({
+        type: 2,
+        item_id,
+        item_name,
+        user_id: latestFiveBids[i].bidder,
+        price: latestFiveBids[i].bid_price,
+        prev_user_id: latestFiveBids[i - 1].bidder,
+        delay: FIVE_MINUTES * time_index++,
+        seller,
+      });
     }
     const lastValidBidIndex = Math.min(latestFiveBids.length, 5) - 1;
-    await addJobWithCallback({ type: 3, item_id, prev_user_id: latestFiveBids[lastValidBidIndex].bidder }, FIVE_MINUTES * time_index);
+    await scheduleTransfer({ type: 3, item_id, prev_user_id: latestFiveBids[lastValidBidIndex].bidder, delay: FIVE_MINUTES * time_index });
   }
 
   private async handleDBStatus(latestFiveBids: Bid[], item_id: string) {

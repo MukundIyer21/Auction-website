@@ -1,18 +1,24 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 import { mongoConfig } from "./config";
 import { Bid, Item } from "./types";
+import { invalidateItemDetails } from "./redis";
 
 const bidSchema = new Schema<Bid>({
   bid_price: { type: String, required: true },
   bidder: { type: String, required: true },
-  item_id: { type: Schema.Types.ObjectId, ref: "Item", required: true },
+  item_id: { type: String, ref: "Item", required: true },
   timestamp: { type: Date, default: Date.now },
 });
 
 const itemSchema = new Schema<Item>({
-  details: { type: Object, required: true },
-  rating: { type: String, enum: ["pending", "1", "2", "3", "4", "5"], required: true },
-  status: { type: String, enum: ["pending", "active", "sold", "transferring", "unsold"], required: true },
+  _id: { type: String, required: true },
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  images: { type: [String], required: true },
+  category: { type: [String], required: true },
+  auction_end: { type: Date, required: true },
+  rating: { type: String, enum: ["PENDING", "ONE", "TWO", "THREE", "FOUR", "FIVE"], required: true },
+  status: { type: String, enum: ["PENDING", "ACTIVE", "SOLD", "TRANSFERRING", "UNSOLD"], required: true },
 });
 
 const BidModel: Model<Bid> = mongoose.model<Bid>("Bid", bidSchema);
@@ -33,24 +39,23 @@ async function connectToDatabase() {
 }
 
 async function getLatestBids(itemId: string, noOfBids = 5): Promise<Bid[]> {
-  return await BidModel.find({ item_id: new mongoose.Types.ObjectId(itemId) })
-    .sort({ timestamp: -1 })
-    .limit(noOfBids)
-    .exec();
+  return await BidModel.find({ item_id: itemId }).sort({ timestamp: -1 }).limit(noOfBids).exec();
 }
 
 async function updateItemStatusToTransferring(itemId: string) {
-  await ItemModel.findByIdAndUpdate(itemId, { status: "transferring" });
+  await invalidateItemDetails(itemId);
+  await ItemModel.findByIdAndUpdate(itemId, { status: "TRANSFERRING" });
 }
 
 async function updateItemStatusToUnsold(itemId: string) {
-  await ItemModel.findByIdAndUpdate(itemId, { status: "unsold" });
+  await invalidateItemDetails(itemId);
+  await ItemModel.findByIdAndUpdate(itemId, { status: "UNSOLD" });
 }
 
 async function checkIfItemIsSold(itemId: string): Promise<boolean> {
   const item = await ItemModel.findById(itemId);
   if (item === null) return true;
-  return item.status === "sold";
+  return item.status === "SOLD";
 }
 
 async function checkIfItemExists(itemId: string) {

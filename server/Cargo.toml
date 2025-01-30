@@ -1,0 +1,30 @@
+[package]
+name = "auction-server"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+path="src/lib.rs"
+
+[dependencies]
+dotenv = "0.15"
+config = "0.11"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+redis = { version = "0.26", features = ["tokio-comp"] } 
+serde_json = "1.0"
+bb8 = "0.8"
+bb8-redis = "0.13"
+mongodb = { version = "2.0", features = ["bson-chrono-0_4"] }
+bson = { version = "2.0", features = ["chrono-0_4"] }
+mongodm = "0.10.0"
+futures = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
+reqwest = { version = "0.11", default-features = false, features = ["json","rustls-tls","cookies"] }
+actix-web = { version = "4.4.0", default-features = false, features = ["macros","cookies"] }
+uuid = { version = "1", features = ["serde", "v4"] }
+aws-sdk-s3 = { version = "1.32.0", features = ["rt-tokio"] }
+aws-config = { version = "1.1.7", features = ["rt-tokio"] }
+base64 = { version = "0.22.0", features = ["std"] }
+env_logger = "0.10"
+log="0.4"

@@ -23,7 +23,7 @@ router.post("/item", async (req, res) => {
         const operationId = await queueAddItem(seller, item_id);
         res.send({
             status: "pending",
-            operationId,
+            operation_id: operationId,
             message: "Item addition queued for processing"
         });
     } catch (error) {
@@ -49,7 +49,7 @@ router.delete("/item/:item_id", async (req, res) => {
         const operationId = await queueDeleteItem(owner, item_id);
         res.send({
             status: "pending",
-            operationId,
+            operation_id: operationId,
             message: "Item deletion queued for processing"
         });
     } catch (error) {
@@ -72,7 +72,7 @@ router.post("/transfer", async (req, res) => {
         const operationId = await queueTransferItem(to, item_id);
         res.send({
             status: "pending",
-            operationId,
+            operation_id: operationId,
             message: "Item transfer queued for processing"
         });
     } catch (error) {
@@ -90,29 +90,6 @@ router.get("/userItems/:user", async (req, res) => {
         res.send({
             status: "success",
             items
-        });
-    } catch (error) {
-        res.status(500).send({
-            status: "error",
-            message: error.message
-        });
-    }
-});
-
-router.get("/operation/:operationId", async (req, res) => {
-    try {
-        const { operationId } = req.params;
-        const operation = await getOperationStatus(operationId);
-        res.send({
-            status: "success",
-            operation: {
-                status: operation.status,
-                type: operation.type,
-                transactionHash: operation.transactionHash,
-                error: operation.error,
-                createdAt: operation.createdAt,
-                updatedAt: operation.updatedAt
-            }
         });
     } catch (error) {
         res.status(500).send({

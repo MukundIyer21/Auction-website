@@ -98,9 +98,9 @@ const queueAddItem = async (owner, itemId) => {
 
     const operationId = crypto.randomUUID();
     const operation = new Operation({
-        operationId,
+        operation_id: operationId,
         type: 'ADD',
-        params: { owner, itemId }
+        params: { owner, item_id: itemId }
     });
 
     await operation.save();
@@ -121,9 +121,9 @@ const queueTransferItem = async (to, itemId) => {
 
     const operationId = crypto.randomUUID();
     const operation = new Operation({
-        operationId,
+        operation_id: operationId,
         type: 'TRANSFER',
-        params: { to, itemId }
+        params: { to, item_id: itemId }
     });
 
     await operation.save();
@@ -144,9 +144,9 @@ const queueDeleteItem = async (owner, itemId) => {
 
     const operationId = crypto.randomUUID();
     const operation = new Operation({
-        operationId,
+        operation_id: operationId,
         type: 'DELETE',
-        params: { owner, itemId }
+        params: { owner, item_id: itemId }
     });
 
     await operation.save();
@@ -169,7 +169,7 @@ const getUserItems = async (user) => {
 };
 
 const getOperationStatus = async (operationId) => {
-    const operation = await Operation.findOne({ operationId });
+    const operation = await Operation.findOne({ operation_id: operationId });
     if (!operation) {
         throw new Error('Operation not found');
     }

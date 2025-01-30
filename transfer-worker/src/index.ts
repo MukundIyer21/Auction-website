@@ -11,6 +11,7 @@ const main = async () => {
     while (true) {
       const dequeuedData = await dequeue();
       if (dequeuedData) {
+        console.log("Data dequeued :", dequeuedData);
         await TransferWorker.getInstance().process(dequeuedData);
       } else {
         await sleep(1);

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const operationSchema = new mongoose.Schema({
-    operationId: {
+    operation_id: {
         type: String,
         required: true,
         unique: true,
@@ -21,12 +21,12 @@ const operationSchema = new mongoose.Schema({
         required: true,
     },
     error: String,
-    transactionHash: String,
-    createdAt: {
+    transaction_hash: String,
+    created_at: {
         type: Date,
         default: Date.now,
     },
-    updatedAt: {
+    updated_at: {
         type: Date,
         default: Date.now,
     },

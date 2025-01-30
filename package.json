@@ -1,0 +1,20 @@
+{
+  "name": "major-project-auction-backend",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "npm run docker && wait-on tcp:5432 && npm run services",
+    "services": "concurrently -n \"t-worker,t-scheduler,b-api-worker,home,wss,server\" -c \"red,green,yellow,blue,magenta,cyan\" \"npm:transfer-worker\" \"npm:transfer-scheduler\" \"npm:blockchain-api-worker\" \"npm:home-mock\" \"npm:wss\" \"npm:server\"",
+    "transfer-worker": "cd transfer-worker && npm run dev",
+    "transfer-scheduler": "cd transfer-scheduler && npm run dev",
+    "blockchain-api-worker": "cd blockchain API and worker && npm run dev",
+    "home-mock": "cd home-mock && npm run dev",
+    "wss": "cd wss && npm run dev",
+    "server": "cd server && cargo run",
+    "docker": "cd docker && docker-compose up -d"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.2.0"
+  }
+}

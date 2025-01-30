@@ -26,16 +26,16 @@ async function processOperation(operation) {
         }
 
         await Operation.findOneAndUpdate(
-            { operationId },
+            { operation_id: operationId },
             {
                 status: 'COMPLETED',
-                transactionHash: result.transactionHash
+                transaction_hash: result.transactionHash
             }
         );
     } catch (error) {
         console.error('Error processing operation:', error);
         await Operation.findOneAndUpdate(
-            { operationId },
+            { operation_id: operationId },
             {
                 status: 'FAILED',
                 error: error.message

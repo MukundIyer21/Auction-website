@@ -10,11 +10,3 @@ export const redisConfig = {
 export const bullmqConfig = {
   redis: redisConfig,
 };
-
-export const transferSchedulerConfig = {
-  base_uri: process.env.TRANSFER_SCHEDULER_BASE_URI || "http://localhost:3003",
-};
-
-export const mongoConfig = {
-  uri: process.env.MONGO_URI || "mongodb://localhost:27017/auction_db",
-};

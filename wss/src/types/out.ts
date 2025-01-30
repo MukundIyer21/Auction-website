@@ -3,6 +3,7 @@ type TransferMessages = {
   item_id: string;
   item_name: string;
   price: string;
+  seller: string;
 };
 
 type BidUpdateMessages = {
