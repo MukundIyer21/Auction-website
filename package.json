@@ -11,7 +11,15 @@
     "home-mock": "cd home-mock && npm run dev",
     "wss": "cd wss && npm run dev",
     "server": "cd server && cargo run",
-    "docker": "cd docker && docker-compose up -d"
+    "docker": "cd docker && docker-compose up -d",
+    "install-js-deps": "concurrently \"npm:install-transfer-worker\" \"npm:install-transfer-scheduler\" \"npm:install-blockchain-api-worker\" \"npm:install-home-mock\" \"npm:install-wss\"",
+    "install-transfer-worker": "cd transfer-worker && npm install",
+    "install-transfer-scheduler": "cd transfer-scheduler && npm install", 
+    "install-blockchain-api-worker": "cd blockchain API and worker && npm run setup",
+    "install-home-mock": "cd home-mock && npm install",
+    "install-wss": "cd wss && npm install",
+    "install-server": "cd server && cargo build",
+    "setup": "npm install && npm run install-js-deps && npm run install-server"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
