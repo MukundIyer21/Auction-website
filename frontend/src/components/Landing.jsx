@@ -22,7 +22,7 @@ const Landing = () => {
         className="flex flex-col items-center justify-center flex-grow text-center mt-10 px-4 md:px-0"
       >
         <h1 className="text-3xl md:text-6xl font-bold mb-4">
-          Welcome to <span className="text-yellow-400">E-Auction</span>
+          Welcome to <span className="text-yellow-400">Smartbid</span>
         </h1>
         <p className="text-md md:text-xl text-gray-300 mb-6 max-w-3xl">
           The ultimate place to buy and sell goods online through bidding.
@@ -44,7 +44,7 @@ const Landing = () => {
       >
         <div className="container mx-auto px-8">
           <h2 className="text-3xl font-bold text-center mb-8">
-            Why Choose <span className="text-yellow-400">E-Auction?</span>
+            Why Choose <span className="text-yellow-400">Smartbid?</span>
           </h2>
           <div className="flex flex-col md:flex-row justify-around items-center">
   

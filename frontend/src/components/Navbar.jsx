@@ -14,7 +14,7 @@ const handleToggle = () => {
   return (
     <nav className="bg-gray-800 text-white px-4 py-3 flex justify-between items-center">
       <div className="text-2xl font-bold text-yellow-400">
-        <h2>E-Auction</h2>
+        <h2>Smartbid</h2>
       </div>
 
       {/* Menu Icon for Mobile View */}
@@ -36,11 +36,11 @@ const handleToggle = () => {
         <li className="text-lg my-2 md:my-0">
           <a href="#contact" className="block py-2 px-4 hover:text-yellow-400">Contact</a>
         </li>
-        <li className="my-2 md:my-0">
+        {/* <li className="my-2 md:my-0">
           <a href="#login" className="block py-2 px-4 bg-yellow-500 rounded hover:bg-yellow-600 text-white">
             Login
           </a>
-        </li>
+        </li> */}
       </ul>
     </nav>
   )
