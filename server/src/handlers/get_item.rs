@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use crate::{
     mongo::{Item, MongoClient},
     redis::RedisClient,
+    types::CurrentBid,
 };
 
 #[get("/api/v1/item")]
@@ -54,6 +55,17 @@ pub async fn get_item_handler(
                 }
             }
         }
+    };
+
+    let item_current_bid: Option<CurrentBid> =
+        match redis_client.get_value("current_bid", &item_id).await {
+            Ok(current_bid) => current_bid,
+            Err(_) => None,
+        };
+
+    let item_current_bid_price = match item_current_bid {
+        Some(current_bid) => current_bid.bid_price,
+        None => -1.0,
     };
 
     let similar_item_ids: Vec<String> = match redis_client.get_similar_items(&item_id).await {
@@ -108,6 +120,7 @@ pub async fn get_item_handler(
     HttpResponse::Ok().json(json!({
         "status": "success",
         "item_details": item_details,
+        "current_bid_price" : item_current_bid_price,
         "similar_items_details": final_similar_items
     }))
 }

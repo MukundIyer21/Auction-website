@@ -56,10 +56,11 @@ pub struct Item {
     pub title: String,
     pub description: String,
     pub images: Vec<String>,
-    pub category: Vec<String>,
+    pub category: String,
     pub auction_end: DateTime,
     pub rating: Rating,
     pub status: ItemStatus,
+    pub base_price: f64,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

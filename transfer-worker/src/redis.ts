@@ -86,6 +86,15 @@ export async function invalidateItemDetails(itemId: string) {
   }
 }
 
+export async function invalidateItemsCurrentBid(itemId: string) {
+  try {
+    await redisClient.del(`current_bid:${itemId}`);
+  } catch (err) {
+    console.error("Error invalidating item's current bid:", err);
+    throw err;
+  }
+}
+
 export async function removeItemFromSimilarItems(itemId: string) {
   try {
     const key = `similar_items:${itemId}`;

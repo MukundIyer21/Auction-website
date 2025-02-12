@@ -4,7 +4,7 @@ import { Bid, Item } from "./types";
 import { invalidateItemDetails } from "./redis";
 
 const bidSchema = new Schema<Bid>({
-  bid_price: { type: String, required: true },
+  bid_price: { type: Number, required: true },
   bidder: { type: String, required: true },
   item_id: { type: String, ref: "Item", required: true },
   timestamp: { type: Date, default: Date.now },
@@ -15,8 +15,9 @@ const itemSchema = new Schema<Item>({
   title: { type: String, required: true },
   description: { type: String, required: true },
   images: { type: [String], required: true },
-  category: { type: [String], required: true },
+  category: { type: String, required: true },
   auction_end: { type: Date, required: true },
+  base_price: { type: Number, required: true },
   rating: { type: String, enum: ["PENDING", "ONE", "TWO", "THREE", "FOUR", "FIVE"], required: true },
   status: { type: String, enum: ["PENDING", "ACTIVE", "SOLD", "TRANSFERRING", "UNSOLD"], required: true },
 });

@@ -26,7 +26,8 @@ struct ItemDetails {
     title: String,
     description: String,
     images: Vec<String>,
-    category: Vec<String>,
+    category: String,
+    base_price: f64,
 }
 
 #[derive(Deserialize)]
@@ -169,6 +170,7 @@ pub async fn post_item_handler(
                 auction_end,
                 rating: Rating::PENDING,
                 status: ItemStatus::PENDING,
+                base_price: req.item_details.base_price,
             };
 
             let items_collection = mongo_client.get_db().collection::<Item>("items");

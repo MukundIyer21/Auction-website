@@ -57,7 +57,7 @@ export type transferSchedulerData =
     };
 
 export interface Bid extends Document {
-  bid_price: string;
+  bid_price: number;
   bidder: string;
   item_id: string;
   timestamp: Date;
@@ -68,8 +68,9 @@ export interface Item extends Document {
   title: string;
   description: string;
   images: [string];
-  category: [string];
+  category: string;
   auction_end: Date;
   rating: string;
   status: string;
+  base_price: number;
 }

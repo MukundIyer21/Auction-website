@@ -11,6 +11,7 @@ const contract = new ethers.Contract(config.polygon.contractAddress, abiFile.abi
 
 async function executeWithGasEstimate(methodName, params) {
     try {
+        const nonce = wallet.getTransactionCount("latest");
         const currentGasPrice = await provider.getGasPrice();
         const estimatedGas = await contract.estimateGas[methodName](...params);
         const gasLimit = estimatedGas.mul(ethers.BigNumber.from(12)).div(ethers.BigNumber.from(10));
@@ -18,7 +19,8 @@ async function executeWithGasEstimate(methodName, params) {
 
         const tx = await contract[methodName](...params, {
             gasLimit: gasLimit,
-            gasPrice: finalGasPrice
+            gasPrice: finalGasPrice,
+            nonce: nonce
         });
 
         const receipt = await tx.wait(1);

@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct MessageToPublish<'a> {
@@ -36,4 +36,10 @@ pub struct HomePageAPIURI {
 #[derive(Debug, Clone)]
 pub struct TransferSchedulerURI {
     pub uri: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct CurrentBid {
+    pub bid_price: f64,
+    pub bidder: String,
 }

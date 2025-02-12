@@ -1,6 +1,6 @@
 use crate::mongo::{Bid, Item, MongoClient};
 use crate::redis::RedisClient;
-use crate::types::MessageToPublish;
+use crate::types::{CurrentBid, MessageToPublish};
 use actix_web::{post, web, HttpResponse, Responder};
 use bson::{doc, DateTime};
 use chrono::Utc;
@@ -9,8 +9,6 @@ use serde::{Deserialize, Serialize};
 #[derive(Deserialize)]
 pub struct PlaceBidRequest {
     item_id: String,
-    price: f64,
-    is_initial_bid: bool,
     incrementation: f64,
     bidder: String,
 }
@@ -21,26 +19,13 @@ pub struct PlaceBidResponse {
     message: String,
 }
 
-#[derive(Serialize, Deserialize)]
-struct CurrentBid {
-    bid_price: f64,
-    bidder: String,
-}
-
 #[post("/api/v1/place")]
 pub async fn place_bid_handler(
     web::Json(payload): web::Json<PlaceBidRequest>,
     mongo_client: web::Data<MongoClient>,
     redis_client: web::Data<RedisClient>,
 ) -> impl Responder {
-    if payload.is_initial_bid && (payload.price <= 0.0) {
-        return HttpResponse::BadRequest().json(PlaceBidResponse {
-            status: "error".to_string(),
-            message: "Invalid bid price".to_string(),
-        });
-    }
-
-    if !payload.is_initial_bid && payload.incrementation <= 0.0 {
+    if payload.incrementation <= 0.0 {
         return HttpResponse::BadRequest().json(PlaceBidResponse {
             status: "error".to_string(),
             message: "Invalid incrementation to bid price".to_string(),
@@ -52,7 +37,7 @@ pub async fn place_bid_handler(
     let bids_collection = db.collection::<Bid>("bids");
     let bidder_id = payload.bidder;
 
-    let _item = match items_collection
+    let item = match items_collection
         .find_one(doc! {"_id": &payload.item_id}, None)
         .await
     {
@@ -77,8 +62,22 @@ pub async fn place_bid_handler(
         }
     };
 
-    let bid_price = if payload.is_initial_bid {
-        payload.price
+    let is_initial_bid = match bids_collection
+        .find_one(doc! {"item_id" : &payload.item_id}, None)
+        .await
+    {
+        Ok(Some(_bid)) => false,
+        Ok(None) => true,
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(PlaceBidResponse {
+                status: "error".to_string(),
+                message: "Database error".to_string(),
+            });
+        }
+    };
+
+    let bid_price = if is_initial_bid {
+        item.base_price
     } else {
         let current_bid: Option<CurrentBid> = match redis_client
             .get_value("current_bid", &payload.item_id)

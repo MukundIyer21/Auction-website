@@ -1,6 +1,6 @@
 import { scheduleTransfer } from "./axios";
 import { checkIfItemExists, checkIfItemIsSold, getLatestBids, updateItemStatusToTransferring, updateItemStatusToUnsold } from "./db";
-import { addItemToUserList, publish, removeItemFromSimilarItems, removeItemFromUserList } from "./redis";
+import { addItemToUserList, invalidateItemsCurrentBid, publish, removeItemFromSimilarItems, removeItemFromUserList } from "./redis";
 import { transferQueueElement, Bid } from "./types";
 
 class TransferWorker {
@@ -43,17 +43,18 @@ class TransferWorker {
 
   private async handleFirstBid(dequedElement: transferQueueElement) {
     const { item_name, item_id, seller } = dequedElement?.type == 1 ? dequedElement : { item_name: "", item_id: "", seller: "" };
+    await invalidateItemsCurrentBid(item_id);
     await removeItemFromSimilarItems(item_id);
     const latestFiveBids = await getLatestBids(item_id, 5);
     await this.handleDBStatus(latestFiveBids, item_id);
     if (latestFiveBids.length == 0) {
       return;
     }
-    await addItemToUserList(latestFiveBids[0].bidder, { item_id, price: latestFiveBids[0].bid_price, item_name, seller });
+    await addItemToUserList(latestFiveBids[0].bidder, { item_id, price: latestFiveBids[0].bid_price.toString(), item_name, seller });
     await publish("transfer", {
       item_id,
       user_id: latestFiveBids[0].bidder,
-      price: latestFiveBids[0].bid_price,
+      price: latestFiveBids[0].bid_price.toString(),
       item_name,
       seller,
     });
@@ -69,7 +70,7 @@ class TransferWorker {
         item_id,
         item_name,
         user_id: latestFiveBids[i].bidder,
-        price: latestFiveBids[i].bid_price,
+        price: latestFiveBids[i].bid_price.toString(),
         prev_user_id: latestFiveBids[i - 1].bidder,
         delay: FIVE_MINUTES * time_index++,
         seller,
