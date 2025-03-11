@@ -5,7 +5,7 @@ use mongodm::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::string::ToString;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum Rating {
     PENDING,
     ONE,
@@ -15,7 +15,7 @@ pub enum Rating {
     FIVE,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ItemStatus {
     PENDING,
     ACTIVE,
@@ -49,7 +49,7 @@ impl ToString for Rating {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Item {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,

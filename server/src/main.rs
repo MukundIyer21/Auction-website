@@ -3,9 +3,9 @@ use auction_server::{
     awss3::AWSClient,
     config::Config,
     handlers::{
-        delete_item_handler, get_home_page_handler, get_item_handler, get_operation_status_handler,
-        get_user_items_handler, health_check_handler, place_bid_handler, post_item_handler,
-        transfer_item_handler,
+        delete_item_handler, get_category_items_handler, get_home_page_handler, get_item_handler,
+        get_operation_status_handler, get_user_items_handler, health_check_handler,
+        place_bid_handler, post_item_handler, transfer_item_handler,
     },
     mongo::MongoClient,
     redis::RedisClient,
@@ -74,6 +74,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_user_items_handler)
             .service(delete_item_handler)
             .service(transfer_item_handler)
+            .service(get_category_items_handler)
             .app_data(redis_client.clone())
             .app_data(mongo_client.clone())
             .app_data(aws_client.clone())

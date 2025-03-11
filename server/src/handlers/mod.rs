@@ -1,4 +1,5 @@
 mod delete_item;
+mod get_category_items;
 mod get_home_page;
 mod get_item;
 mod get_operation_status;
@@ -9,6 +10,7 @@ mod post_item;
 mod transfer_item;
 
 pub use delete_item::delete_item_handler;
+pub use get_category_items::get_category_items_handler;
 pub use get_home_page::get_home_page_handler;
 pub use get_item::get_item_handler;
 pub use get_operation_status::get_operation_status_handler;

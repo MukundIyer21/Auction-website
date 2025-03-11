@@ -15,7 +15,7 @@ app.post("/", async (req, res) => {
     }
   } catch (err) {
     console.log("Error occured:", err);
-    res.json({ status: "success", message: "Internal server error" });
+    res.json({ status: "error", message: "Internal server error" });
   }
 });
 

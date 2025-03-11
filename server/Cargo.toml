@@ -28,3 +28,5 @@ aws-config = { version = "1.1.7", features = ["rt-tokio"] }
 base64 = { version = "0.22.0", features = ["std"] }
 env_logger = "0.10"
 log="0.4"
+elasticsearch = "8.5.0-alpha.1"
+url = "2.4.0"
