@@ -3,6 +3,7 @@ use bson::{doc, Bson};
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    elasticsearch::ElasticSearchClient,
     mongo::{Item, MongoClient},
     redis::RedisClient,
     types::BlockchainAPIURI,
@@ -47,6 +48,7 @@ pub async fn transfer_item_handler(
     req_body: web::Json<TransferItemRequest>,
     mongo_client: web::Data<MongoClient>,
     redis_client: web::Data<RedisClient>,
+    elasticsearch_client: web::Data<ElasticSearchClient>,
     blockchain_api_base_uri: web::Data<BlockchainAPIURI>,
 ) -> impl Responder {
     let item_id = req_body.item_id.clone();
@@ -178,6 +180,10 @@ pub async fn transfer_item_handler(
                     let _ = redis_client
                         .delete_key(&format!("item_details:{}", item_id))
                         .await;
+
+                    if let Err(err) = elasticsearch_client.remove_item(&item_id).await {
+                        eprintln!("Failed to remove item from elastic search : {:?}", err);
+                    }
 
                     HttpResponse::Ok().json(TransferItemResponse {
                         status: "success".to_string(),

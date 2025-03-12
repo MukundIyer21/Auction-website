@@ -14,6 +14,7 @@ pub struct Config {
     pub aws_secret_access_key: String,
     pub aws_bucket: String,
     pub aws_region: String,
+    pub elasticsearch_uri: String,
 }
 
 impl Config {

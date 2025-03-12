@@ -8,7 +8,7 @@ pub async fn get_category_items_handler(
     mongo_client: web::Data<crate::mongo::MongoClient>,
     redis_client: web::Data<crate::redis::RedisClient>,
 ) -> impl Responder {
-    let category_name = path.into_inner();
+    let category_name = path.into_inner().to_lowercase();
 
     let cache_key = format!("category_items:{}", category_name);
     if let Ok(Some(cached_items)) = redis_client

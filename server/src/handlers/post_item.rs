@@ -9,6 +9,7 @@ use uuid::Uuid;
 
 use crate::{
     awss3::AWSClient,
+    elasticsearch::ElasticSearchClient,
     mongo::{Item, ItemStatus, MongoClient, Rating},
     redis::RedisClient,
     types::{BlockchainAPIURI, MessageToEnqueue, TransferSchedulerURI},
@@ -99,6 +100,7 @@ pub async fn post_item_handler(
     mongo_client: web::Data<MongoClient>,
     redis_client: web::Data<RedisClient>,
     s3_client: web::Data<AWSClient>,
+    elasticsearch_client: web::Data<ElasticSearchClient>,
     blockchain_api_base_uri: web::Data<BlockchainAPIURI>,
     transfer_scheduler_uri: web::Data<TransferSchedulerURI>,
 ) -> impl Responder {
@@ -166,7 +168,7 @@ pub async fn post_item_handler(
                 title: req.item_details.title.clone(),
                 description: req.item_details.description.clone(),
                 images: image_urls,
-                category: req.item_details.category.clone(),
+                category: req.item_details.category.clone().to_lowercase(),
                 auction_end,
                 rating: Rating::PENDING,
                 status: ItemStatus::PENDING,
@@ -200,6 +202,20 @@ pub async fn post_item_handler(
                     {
                         Ok(_) => {}
                         Err(e) => eprintln!("Failed to push to rate queue: {:?}", e),
+                    }
+
+                    match elasticsearch_client
+                        .index_item(
+                            &item_id,
+                            &req.item_details.title,
+                            &req.item_details.category,
+                        )
+                        .await
+                    {
+                        Ok(_) => {}
+                        Err(err) => {
+                            eprintln!("Failed to index item in Elasticsearch: {:?}", err);
+                        }
                     }
 
                     HttpResponse::Ok().json(CreateItemResponse {

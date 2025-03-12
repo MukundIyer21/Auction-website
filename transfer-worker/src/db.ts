@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 import { mongoConfig } from "./config";
 import { Bid, Item } from "./types";
 import { invalidateItemDetails } from "./redis";
+import { removeItemFromElasticsearch } from "./elasticsearch";
 
 const bidSchema = new Schema<Bid>({
   bid_price: { type: Number, required: true },
@@ -45,6 +46,7 @@ async function getLatestBids(itemId: string, noOfBids = 5): Promise<Bid[]> {
 
 async function updateItemStatusToTransferring(itemId: string) {
   await invalidateItemDetails(itemId);
+  await removeItemFromElasticsearch(itemId);
   await ItemModel.findByIdAndUpdate(itemId, { status: "TRANSFERRING" });
 }
 

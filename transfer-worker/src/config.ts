@@ -11,6 +11,11 @@ export const bullmqConfig = {
   redis: redisConfig,
 };
 
+export const elasticSearchConfig = {
+  baseUrl: process.env.ELASTICSEARCH_URL || "http://localhost:9200",
+  index: "item_search",
+};
+
 export const transferSchedulerConfig = {
   base_uri: process.env.TRANSFER_SCHEDULER_BASE_URI || "http://localhost:3003",
 };

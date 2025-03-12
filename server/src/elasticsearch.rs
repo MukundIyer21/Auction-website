@@ -82,6 +82,16 @@ impl ElasticSearchClient {
                                 }
                             }
                         },
+                        "category": {
+                            "type": "text",
+                            "analyzer": "autocomplete",
+                            "search_analyzer": "autocomplete_search",
+                            "fields": {
+                                "keyword": {
+                                    "type": "keyword"
+                                }
+                            }
+                        },
                         "item_id": {
                             "type": "keyword"
                         }
@@ -94,12 +104,18 @@ impl ElasticSearchClient {
         Ok(())
     }
 
-    pub async fn index_item(&self, item_id: &str, item_name: &str) -> Result<(), Error> {
+    pub async fn index_item(
+        &self,
+        item_id: &str,
+        item_name: &str,
+        category: &str,
+    ) -> Result<(), Error> {
         self.client
             .index(IndexParts::Index(&self.index_name))
             .body(json!({
                 "item_id": item_id,
                 "item_name": item_name,
+                "category": category,
             }))
             .refresh(Refresh::True)
             .send()
@@ -121,17 +137,23 @@ impl ElasticSearchClient {
                 "query": {
                     "multi_match": {
                         "query": query,
-                        "fields": ["item_name", "item_name.keyword^2"],
+                        "fields": [
+                            "item_name^2",
+                            "item_name.keyword^3",
+                            "category",
+                            "category.keyword^2"
+                        ],
                         "type": "best_fields",
                         "fuzziness": "AUTO"
                     }
                 },
                 "highlight": {
                     "fields": {
-                        "item_name": {}
+                        "item_name": {},
+                        "category": {}
                     }
                 },
-                "_source": ["item_id", "item_name"]
+                "_source": ["item_id", "item_name", "category"]
             }))
             .send()
             .await?;
@@ -150,12 +172,22 @@ impl ElasticSearchClient {
                     .as_str()
                     .unwrap_or_default()
                     .to_string();
+                let category = hit["_source"]["category"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_string();
                 let score = hit["_score"].as_f64().unwrap_or_default();
 
                 results.push(SearchResult {
                     item_id,
                     item_name,
+                    category,
                     score,
+                    matched_field: if hit["highlight"]["category"].is_array() {
+                        "category".to_string()
+                    } else {
+                        "name".to_string()
+                    },
                 });
             }
         }
@@ -180,7 +212,8 @@ impl ElasticSearchClient {
                                 "match_phrase_prefix": {
                                     "item_name": {
                                         "query": prefix,
-                                        "max_expansions": 10
+                                        "max_expansions": 10,
+                                        "boost": 2.0
                                     }
                                 }
                             },
@@ -188,14 +221,36 @@ impl ElasticSearchClient {
                                 "prefix": {
                                     "item_name.keyword": {
                                         "value": prefix,
-                                        "boost": 2.0
+                                        "boost": 3.0
+                                    }
+                                }
+                            },
+                            {
+                                "match_phrase_prefix": {
+                                    "category": {
+                                        "query": prefix,
+                                        "max_expansions": 10
+                                    }
+                                }
+                            },
+                            {
+                                "prefix": {
+                                    "category.keyword": {
+                                        "value": prefix,
+                                        "boost": 1.5
                                     }
                                 }
                             }
                         ]
                     }
                 },
-                "_source": ["item_id", "item_name"]
+                "highlight": {
+                    "fields": {
+                        "item_name": {},
+                        "category": {}
+                    }
+                },
+                "_source": ["item_id", "item_name", "category"]
             }))
             .send()
             .await?;
@@ -214,17 +269,40 @@ impl ElasticSearchClient {
                     .as_str()
                     .unwrap_or_default()
                     .to_string();
+                let category = hit["_source"]["category"]
+                    .as_str()
+                    .unwrap_or_default()
+                    .to_string();
                 let score = hit["_score"].as_f64().unwrap_or_default();
 
                 results.push(SearchResult {
                     item_id,
                     item_name,
+                    category,
                     score,
+                    matched_field: if hit["highlight"]["category"].is_array() {
+                        "category".to_string()
+                    } else {
+                        "name".to_string()
+                    },
                 });
             }
         }
 
         Ok(results)
+    }
+
+    pub async fn remove_item(&self, item_id: &str) -> Result<(), Error> {
+        self.client
+            .delete(elasticsearch::DeleteParts::IndexId(
+                &self.index_name,
+                item_id,
+            ))
+            .refresh(Refresh::True)
+            .send()
+            .await?;
+
+        Ok(())
     }
 }
 
@@ -232,5 +310,7 @@ impl ElasticSearchClient {
 pub struct SearchResult {
     pub item_id: String,
     pub item_name: String,
+    pub category: String,
     pub score: f64,
+    pub matched_field: String,
 }

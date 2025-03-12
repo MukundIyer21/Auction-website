@@ -3,6 +3,7 @@ use bson::doc;
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    elasticsearch::ElasticSearchClient,
     mongo::{Item, MongoClient},
     redis::RedisClient,
     types::BlockchainAPIURI,
@@ -38,6 +39,7 @@ pub async fn delete_item_handler(
     req_body: web::Json<DeleteItemRequest>,
     mongo_client: web::Data<MongoClient>,
     redis_client: web::Data<RedisClient>,
+    elasticsearch_client: web::Data<ElasticSearchClient>,
     blockchain_api_base_uri: web::Data<BlockchainAPIURI>,
 ) -> impl Responder {
     let item_id = item_id.into_inner();
@@ -144,12 +146,24 @@ pub async fn delete_item_handler(
                 });
 
             let collection = mongo_client.get_db().collection::<Item>("items");
-            match collection.delete_one(doc! {"_id": item_id}, None).await {
-                Ok(_) => HttpResponse::Ok().json(DeleteItemResponse {
-                    status: "success".to_string(),
-                    operation_id,
-                    message: "Item Will Be Deleted Shortly".to_string(),
-                }),
+            match collection
+                .delete_one(
+                    doc! {"_id": &
+                    item_id},
+                    None,
+                )
+                .await
+            {
+                Ok(_) => {
+                    if let Err(err) = elasticsearch_client.remove_item(&item_id).await {
+                        eprintln!("Failed to remove item from elastic search : {:?}", err);
+                    };
+                    return HttpResponse::Ok().json(DeleteItemResponse {
+                        status: "success".to_string(),
+                        operation_id,
+                        message: "Item Will Be Deleted Shortly".to_string(),
+                    });
+                }
                 Err(_) => HttpResponse::InternalServerError().json(DeleteItemResponse {
                     status: "error".to_string(),
                     operation_id: None,

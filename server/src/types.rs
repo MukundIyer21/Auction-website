@@ -29,11 +29,6 @@ pub struct BlockchainAPIURI {
 }
 
 #[derive(Debug, Clone)]
-pub struct HomePageAPIURI {
-    pub uri: String,
-}
-
-#[derive(Debug, Clone)]
 pub struct TransferSchedulerURI {
     pub uri: String,
 }

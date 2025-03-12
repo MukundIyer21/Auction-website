@@ -2,14 +2,16 @@ use actix_web::{middleware::Logger, web, App, HttpServer};
 use auction_server::{
     awss3::AWSClient,
     config::Config,
+    elasticsearch::ElasticSearchClient,
     handlers::{
-        delete_item_handler, get_category_items_handler, get_home_page_handler, get_item_handler,
-        get_operation_status_handler, get_user_items_handler, health_check_handler,
-        place_bid_handler, post_item_handler, transfer_item_handler,
+        autocomplete_item_handler, delete_item_handler, get_category_items_handler,
+        get_home_page_handler, get_item_handler, get_operation_status_handler,
+        get_top_categories_handler, get_user_items_handler, health_check_handler,
+        place_bid_handler, post_item_handler, search_item_handler, transfer_item_handler,
     },
     mongo::MongoClient,
     redis::RedisClient,
-    types::{BlockchainAPIURI, HomePageAPIURI, TransferSchedulerURI},
+    types::{BlockchainAPIURI, TransferSchedulerURI},
 };
 use env_logger;
 use log::info;
@@ -35,6 +37,12 @@ async fn main() -> std::io::Result<()> {
             .expect("Failed to get Mongo Client"),
     );
 
+    let elasticsearch_client = web::Data::new(
+        ElasticSearchClient::new(&configurations.elasticsearch_uri, "item_search")
+            .await
+            .expect("Failed to get elastic search client"),
+    );
+
     let aws_client = web::Data::new(
         AWSClient::new(
             &configurations.aws_access_key,
@@ -48,10 +56,6 @@ async fn main() -> std::io::Result<()> {
 
     let blockchain_base_uri = web::Data::new(BlockchainAPIURI {
         uri: configurations.blockchain_api_base_uri,
-    });
-
-    let homepage_base_uri = web::Data::new(HomePageAPIURI {
-        uri: configurations.homepage_api_base_uri,
     });
 
     let transfer_scheduler_base_uri = web::Data::new(TransferSchedulerURI {
@@ -74,12 +78,15 @@ async fn main() -> std::io::Result<()> {
             .service(get_user_items_handler)
             .service(delete_item_handler)
             .service(transfer_item_handler)
+            .service(get_top_categories_handler)
+            .service(autocomplete_item_handler)
+            .service(search_item_handler)
             .service(get_category_items_handler)
             .app_data(redis_client.clone())
             .app_data(mongo_client.clone())
             .app_data(aws_client.clone())
+            .app_data(elasticsearch_client.clone())
             .app_data(blockchain_base_uri.clone())
-            .app_data(homepage_base_uri.clone())
             .app_data(transfer_scheduler_base_uri.clone())
     })
     .bind(("127.0.0.1", 8080))?;

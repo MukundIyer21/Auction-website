@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.17.1",
     "@types/axios": "^0.14.4",
     "@types/mongoose": "^5.11.97",
     "@types/nanoid": "^3.0.0",
