@@ -1,7 +1,6 @@
 use elasticsearch::{
     http::transport::Transport,
     indices::{IndicesCreateParts, IndicesPutMappingParts},
-    params::Refresh,
     Elasticsearch, Error, IndexParts, SearchParts,
 };
 use serde::{Deserialize, Serialize};
@@ -117,7 +116,7 @@ impl ElasticSearchClient {
                 "item_name": item_name,
                 "category": category,
             }))
-            .refresh(Refresh::True)
+            .refresh(elasticsearch::params::Refresh::True)
             .send()
             .await?;
 
@@ -178,16 +177,25 @@ impl ElasticSearchClient {
                     .to_string();
                 let score = hit["_score"].as_f64().unwrap_or_default();
 
+                let matched_field = if hit["highlight"]["category"].is_array() {
+                    if hit["highlight"]["item_name"].is_array() {
+                        "both"
+                    } else {
+                        "category"
+                    }
+                } else if hit["highlight"]["item_name"].is_array() {
+                    "name"
+                } else {
+                    "unknown"
+                }
+                .to_string();
+
                 results.push(SearchResult {
                     item_id,
                     item_name,
                     category,
                     score,
-                    matched_field: if hit["highlight"]["category"].is_array() {
-                        "category".to_string()
-                    } else {
-                        "name".to_string()
-                    },
+                    matched_field,
                 });
             }
         }
@@ -275,16 +283,25 @@ impl ElasticSearchClient {
                     .to_string();
                 let score = hit["_score"].as_f64().unwrap_or_default();
 
+                let matched_field = if hit["highlight"]["category"].is_array() {
+                    if hit["highlight"]["item_name"].is_array() {
+                        "both"
+                    } else {
+                        "category"
+                    }
+                } else if hit["highlight"]["item_name"].is_array() {
+                    "name"
+                } else {
+                    "unknown"
+                }
+                .to_string();
+
                 results.push(SearchResult {
                     item_id,
                     item_name,
                     category,
                     score,
-                    matched_field: if hit["highlight"]["category"].is_array() {
-                        "category".to_string()
-                    } else {
-                        "name".to_string()
-                    },
+                    matched_field,
                 });
             }
         }
@@ -294,11 +311,17 @@ impl ElasticSearchClient {
 
     pub async fn remove_item(&self, item_id: &str) -> Result<(), Error> {
         self.client
-            .delete(elasticsearch::DeleteParts::IndexId(
-                &self.index_name,
-                item_id,
+            .delete_by_query(elasticsearch::DeleteByQueryParts::Index(
+                &[&self.index_name],
             ))
-            .refresh(Refresh::True)
+            .body(json!({
+                "query": {
+                    "term": {
+                        "item_id": item_id
+                    }
+                }
+            }))
+            .refresh(true)
             .send()
             .await?;
 

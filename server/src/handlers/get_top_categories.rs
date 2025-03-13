@@ -16,8 +16,11 @@ pub async fn get_top_categories_handler(
 ) -> impl Responder {
     let limit = query.limit.unwrap_or(10);
 
-    let cache_key = format!("top_categories:{}", limit);
-    if let Ok(Some(cached_categories)) = redis_client.get_value::<Vec<String>>(&cache_key, "").await
+    let cache_prefix = String::from("top_categories");
+    let cache_key = limit;
+    if let Ok(Some(cached_categories)) = redis_client
+        .get_value::<Vec<String>>(&cache_prefix, &cache_key.to_string())
+        .await
     {
         return HttpResponse::Ok().json(serde_json::json!({
             "status": "success",
@@ -81,7 +84,12 @@ pub async fn get_top_categories_handler(
 
     if !top_categories.is_empty() {
         redis_client
-            .set_value(&cache_key, "", &top_categories, Some(180))
+            .set_value(
+                &cache_prefix,
+                &cache_key.to_string(),
+                &top_categories,
+                Some(180),
+            )
             .await
             .ok();
     }
