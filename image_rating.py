@@ -5,6 +5,7 @@ from torchvision import models
 from PIL import Image
 import redis
 import pymongo
+import time
 import io
 import os
 
@@ -17,6 +18,13 @@ print("uri",MONGO_URI)
 db_client = pymongo.MongoClient(MONGO_URI)
 db = db_client["Auction"]
 items_collection = db["Auction_items"]
+rating_dict = {
+    1: "ONE",
+    2: "TWO",
+    3: "THREE",
+    4: "FOUR",
+    5: "FIVE",
+}
 
 # Load pre-trained ResNet-50 model
 model = models.resnet50()
@@ -42,9 +50,9 @@ transform = transforms.Compose([
 def process_item():
     while True:
         # Pop item_id from Redis queue
-        item_id = redis_client.lpop("item_queue")
+        item_id = redis_client.lpop("rating")
         if not item_id:
-            continue
+            time.sleep(2)
         
         item_id = item_id.decode("utf-8")
         print(f"Processing item_id: {item_id}")
@@ -71,11 +79,13 @@ def process_item():
                 ratings.append(rating)
         
         avg_rating = sum(ratings) / len(ratings)
+        rounded_rating = max(1, min(5, round(avg_rating)))  # Ensure rating is between 1 and 10
+        rating_str = rating_dict.get(rounded_rating, "UNKNOWN")
         
         # Update database with rating and set status as ACTIVE
         items_collection.update_one(
             {"_id": item_id},
-            {"$set": {"rating": avg_rating, "status": "ACTIVE"}}
+            {"$set": {"rating": rating_str, "status": "ACTIVE"}}
         )
         
         print(f"Updated item {item_id} with rating {avg_rating} and status ACTIVE")
