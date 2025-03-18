@@ -79,7 +79,7 @@ def process_item():
                 ratings.append(rating)
         
         avg_rating = sum(ratings) / len(ratings)
-        rounded_rating = max(1, min(5, round(avg_rating)))  # Ensure rating is between 1 and 10
+        rounded_rating = max(1, min(5, round(avg_rating)))  # Ensure rating is between 1 and 5
         rating_str = rating_dict.get(rounded_rating, "UNKNOWN")
         
         # Update database with rating and set status as ACTIVE
