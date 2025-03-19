@@ -2,19 +2,18 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize)]
 pub struct MessageToPublish<'a> {
-    item_id: &'a str,
-    price: &'a str,
+    pub price: &'a str,
 }
 
 impl<'a> MessageToPublish<'a> {
-    pub fn new(item_id: &'a str, price: &'a str) -> Self {
-        MessageToPublish { item_id, price }
+    pub fn new(price: &'a str) -> Self {
+        MessageToPublish { price }
     }
 }
 
 #[derive(Serialize)]
 pub struct MessageToEnqueue<'a> {
-    item_id: &'a str,
+    pub item_id: &'a str,
 }
 
 impl<'a> MessageToEnqueue<'a> {

@@ -54,12 +54,9 @@ impl RedisClient {
         queue_name: &str,
         message: MessageToEnqueue<'a>,
     ) -> Result<(), RedisClientError> {
-        let serialized_message =
-            serde_json::to_string(&message).map_err(|_| RedisClientError::SerializationError)?;
-
         let mut conn = self.pool.get().await.map_err(RedisClientError::PoolError)?;
 
-        conn.rpush::<_, _, i64>(queue_name, serialized_message)
+        conn.rpush::<_, _, i64>(queue_name, message.item_id)
             .await
             .map(|_| ())
             .map_err(RedisClientError::OperationError)
@@ -70,12 +67,9 @@ impl RedisClient {
         message: MessageToPublish<'a>,
         channel: &str,
     ) -> Result<(), RedisClientError> {
-        let serialized_message =
-            serde_json::to_string(&message).map_err(|_| RedisClientError::SerializationError)?;
-
         let mut conn = self.pool.get().await.map_err(RedisClientError::PoolError)?;
 
-        conn.publish::<_, _, i64>(channel, serialized_message.as_str())
+        conn.publish::<_, _, i64>(channel, message.price)
             .await
             .map(|_| ())
             .map_err(RedisClientError::OperationError)

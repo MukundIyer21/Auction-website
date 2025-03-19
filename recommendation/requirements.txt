@@ -1,0 +1,9 @@
+pandas
+numpy
+nltk
+scikit-learn
+faiss-cpu
+pymongo
+python-dotenv
+redis
+schedule
