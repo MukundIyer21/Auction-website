@@ -1,72 +1,40 @@
-// AuctionList.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const auctions = [
-  {
-    id: 1,
-    title: "Vintage Car",
-    description: "A rare vintage car from 1920s.",
-    price: "$50,000",
-  },
-  {
-    id: 2,
-    title: "Antique Watch",
-    description: "Classic Rolex from 1950s.",
-    price: "$10,000",
-  },
-  {
-    id: 3,
-    title: "Painting by Picasso",
-    description: "A famous Picasso painting from his blue period.",
-    price: "$100,000",
-  },
-  {
-    id: 4,
-    title: "Vintage Car",
-    description: "A rare vintage car from 1920s.",
-    price: "$50,000",
-  },
-  {
-    id: 5,
-    title: "Antique Watch",
-    description: "Classic Rolex from 1950s.",
-    price: "$10,000",
-  },
-  {
-    id: 6,
-    title: "Painting by Picasso",
-    description: "A famous Picasso painting from his blue period.",
-    price: "$100,000",
-  },
-];
+import Navbar from "./Navbar";
 
 const AuctionList = () => {
+  const [auctions, setAuctions] = useState([]);
   const navigate = useNavigate();
-
-  const handleMoreInfo = (id) => {
-    // Handle navigation to a specific auction detail page or show more info
-    console.log("More info about auction:", id);
-  };
+  
+  useEffect(() => {
+    fetch("http://localhost:5000/api/items") // 
+      .then((res) => res.json())
+      .then((data) => setAuctions(data))
+      .catch((err) => console.error("Error fetching auctions:", err));
+  }, []);
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen">
-      <header className="bg-gray-800 text-yellow-400 px-6 py-4 text-2xl font-bold">
-        Auctions
-      </header>
+
+    <div className="bg-gray-100 text-black min-h-screen">
+      <Navbar/>
 
       <section className="p-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {auctions.map((auction) => (
-            <div key={auction.id} className="bg-gray-800 p-6 rounded-lg shadow-lg">
-              <h2 className="text-xl font-bold mb-2 text-yellow-400">
+            <div key={auction.id} className="bg-white p-5 rounded-lg shadow-lg border border-gray-200">
+              <img
+                src={auction.images[0]} // Display only the first image
+                alt={auction.title}
+                className="w-full h-40 object-contain rounded-md"
+              />
+              <h2 className="text-xl font-bold mt-2 text-gray-800">
                 {auction.title}
               </h2>
-              <p className="text-gray-300 mb-4">{auction.description}</p>
-              <p className="text-lg font-semibold mb-4">{auction.price}</p>
+              <p className="text-gray-600 mb-2">{auction.description}</p>
+              <p className="text-lg font-semibold mb-4 text-gray-700">Rating: {auction.rating}</p>
               <button
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-                onClick={() => handleMoreInfo(auction.id)} // Handle More Info button
+                className="bg-blue-600 hover:bg-blue-700 hover:scale-105 text-white px-4 py-2 rounded w-full transition-all"
+                onClick={() => navigate(`/auction/${auction.id}`)}
               >
                 More Info
               </button>
@@ -74,10 +42,6 @@ const AuctionList = () => {
           ))}
         </div>
       </section>
-
-      {/* <footer className="w-full bg-gray-800 py-6 text-center">
-        <p className="text-gray-400">© 2024 E-Auction. All rights reserved.</p>
-      </footer> */}
     </div>
   );
 };

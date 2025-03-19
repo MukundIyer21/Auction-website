@@ -1,7 +1,7 @@
 import React,{useState} from 'react'
 import { FaBars, FaTimes } from "react-icons/fa";
-
-
+import logo from "./logo1.jpg"; 
+import { motion } from "framer-motion";
 
 const Navbar = () => {
 
@@ -12,9 +12,9 @@ const handleToggle = () => {
 };
 
   return (
-    <nav className="bg-gray-800 text-white px-4 py-3 flex justify-between items-center">
-      <div className="text-2xl font-bold text-yellow-400">
-        <h2>Smartbid</h2>
+    <motion.section className="bg-gray-100 text-black px-6 py-2 flex justify-between items-center shadow-lg" >
+      <div className="flex items-center cursor-pointer">
+        <img src={logo} alt="Smartbid Logo" className="h-[65px]  " />
       </div>
 
       {/* Menu Icon for Mobile View */}
@@ -23,26 +23,21 @@ const handleToggle = () => {
       </div>
 
       {/* Menu Items */}
-      <ul className={`md:flex md:space-x-6 absolute md:static bg-gray-800 w-full md:w-auto transition-all duration-300 ease-in-out ${navOpen ? "top-16 left-0" : "top-[-100%]"}`}>
+      <ul className={`md:flex md:space-x-6 absolute md:static bg-gray-100 w-full md:w-auto transition-all duration-300 ease-in-out ${navOpen ? "top-16 left-0" : "top-[-100%]"}`}>
         <li className="text-lg my-2 md:my-0">
-          <a href="#home" className="block py-2 px-4 hover:text-yellow-400">Home</a>
+          <a href="#home" className="block py-2 px-4 hover:text-yellow-500 transition-colors">Home</a>
         </li>
         <li className="text-lg my-2 md:my-0">
-          <a href="#about" className="block py-2 px-4 hover:text-yellow-400">About</a>
+          <a href="#about" className="block py-2 px-4 hover:text-yellow-500 transition-colors">About</a>
         </li>
         <li className="text-lg my-2 md:my-0">
-          <a href="#auctions" className="block py-2 px-4 hover:text-yellow-400">Auctions</a>
+          <a href="#auctions" className="block py-2 px-4 hover:text-yellow-500 transition-colors">Auctions</a>
         </li>
         <li className="text-lg my-2 md:my-0">
-          <a href="#contact" className="block py-2 px-4 hover:text-yellow-400">Contact</a>
+          <a href="#contact" className="block py-2 px-4 hover:text-yellow-500 transition-colors">Contact</a>
         </li>
-        {/* <li className="my-2 md:my-0">
-          <a href="#login" className="block py-2 px-4 bg-yellow-500 rounded hover:bg-yellow-600 text-white">
-            Login
-          </a>
-        </li> */}
       </ul>
-    </nav>
+    </motion.section>
   )
 }
 
