@@ -51,47 +51,97 @@ async fn upload_images(
     image_inputs: &[String],
     item_id: &str,
 ) -> Result<Vec<String>, String> {
-    let mut uploaded_urls = Vec::new();
+    let mut upload_futures = Vec::new();
 
     for (index, input) in image_inputs.iter().enumerate() {
-        let upload_result = if input.starts_with("data:image") {
-            let base64_parts: Vec<&str> = input.split(",").collect();
-            if base64_parts.len() != 2 {
-                return Err("Invalid base64 image format".to_string());
+        let s3_client = s3_client.clone();
+        let input = input.clone();
+        let item_id = item_id.to_string();
+
+        let future = async move {
+            if input.starts_with("data:image") {
+                let base64_parts: Vec<&str> = input.split(",").collect();
+                if base64_parts.len() != 2 {
+                    return Err(("Invalid base64 image format".to_string(), index));
+                }
+
+                let decoded = base64::engine::general_purpose::STANDARD
+                    .decode(base64_parts[1])
+                    .map_err(|e| (format!("Failed to decode base64 image: {}", e), index))?;
+
+                let temp_path = std::env::temp_dir().join(format!(
+                    "{}_{}_{}.jpg",
+                    item_id,
+                    index + 1,
+                    Uuid::new_v4()
+                ));
+                std::fs::write(&temp_path, &decoded)
+                    .map_err(|e| (format!("Temp file write error: {}", e), index))?;
+
+                let url = s3_client
+                    .upload_image(&item_id, index + 1, Path::new(&temp_path))
+                    .await
+                    .map_err(|e| (e.to_string(), index))?;
+
+                std::fs::remove_file(&temp_path).ok();
+
+                Ok((url, index))
+            } else if input.starts_with("http://") || input.starts_with("https://") {
+                let response = reqwest::get(&input)
+                    .await
+                    .map_err(|e| (format!("Failed to download image from URL: {}", e), index))?;
+
+                let image_bytes = response
+                    .bytes()
+                    .await
+                    .map_err(|e| (format!("Failed to read image bytes: {}", e), index))?;
+
+                let temp_path = std::env::temp_dir().join(format!(
+                    "{}_{}_{}.jpg",
+                    item_id,
+                    index + 1,
+                    Uuid::new_v4()
+                ));
+
+                std::fs::write(&temp_path, &image_bytes)
+                    .map_err(|e| (format!("Temp file write error: {}", e), index))?;
+
+                let url = s3_client
+                    .upload_image(&item_id, index + 1, Path::new(&temp_path))
+                    .await
+                    .map_err(|e| (e.to_string(), index))?;
+
+                std::fs::remove_file(&temp_path).ok();
+
+                Ok((url, index))
+            } else {
+                s3_client
+                    .upload_image(&item_id, index + 1, Path::new(&input))
+                    .await
+                    .map_err(|e| (e.to_string(), index))
+                    .map(|url| (url, index))
             }
-
-            let decoded = base64::engine::general_purpose::STANDARD
-                .decode(base64_parts[1])
-                .map_err(|e| format!("Failed to decode base64 image: {}", e))?;
-
-            let temp_path = std::env::temp_dir().join(format!(
-                "{}_{}_{}.jpg",
-                item_id,
-                index + 1,
-                Uuid::new_v4()
-            ));
-            std::fs::write(&temp_path, &decoded)
-                .map_err(|e| format!("Temp file write error: {}", e))?;
-
-            let url = s3_client
-                .upload_image(item_id, index + 1, Path::new(&temp_path))
-                .await
-                .map_err(|e| e.to_string())?;
-
-            std::fs::remove_file(&temp_path).ok();
-
-            url
-        } else {
-            s3_client
-                .upload_image(item_id, index + 1, Path::new(input))
-                .await
-                .map_err(|e| e.to_string())?
         };
 
-        uploaded_urls.push(upload_result);
+        upload_futures.push(future);
     }
 
-    Ok(uploaded_urls)
+    let results = futures::future::join_all(upload_futures).await;
+
+    let mut urls = vec![String::new(); image_inputs.len()];
+
+    for result in results {
+        match result {
+            Ok((url, index)) => {
+                urls[index] = url;
+            }
+            Err((error_msg, _)) => {
+                return Err(error_msg);
+            }
+        }
+    }
+
+    Ok(urls)
 }
 
 #[post("/api/v1/item")]

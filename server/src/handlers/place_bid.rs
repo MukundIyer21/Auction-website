@@ -135,7 +135,7 @@ pub async fn place_bid_handler(
     let bid_price_str = bid_price.to_string();
     let message = MessageToPublish::new(&bid_price_str);
 
-    if let Err(_) = redis_client.publish(message, &bidder_id).await {
+    if let Err(_) = redis_client.publish(message, &payload.item_id).await {
         eprintln!("Failed to publish bid update");
     }
 
