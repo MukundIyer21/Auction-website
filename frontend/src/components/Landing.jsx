@@ -19,10 +19,6 @@ const collections = [
 const Landing = () => {
   const navigate = useNavigate();
 
-  const handleExploreClick = () => {
-    navigate("/auctions");
-  };
-
   return (
     <>
       <Navbar />
@@ -43,14 +39,14 @@ const Landing = () => {
             <motion.button
               whileHover={{ scale: 1.1 }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg mt-4 mb-4 mx-3 md:mt-6"
-              onClick={handleExploreClick}
+              onClick={() => navigate("/auctions")}
             >
               Explore Auctions
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.1 }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg mt-4 mb-4 mx-3 md:mt-6"
-              onClick={handleExploreClick}
+              onClick={() => navigate("/add-product")}
             >
               Add your product
             </motion.button>

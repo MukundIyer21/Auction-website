@@ -30,7 +30,36 @@ const items = [
     rating: 4.8,
     status: "active",
   },
+  {
+    id: "3",
+    title: "Antique Vase",
+    description: "Beautifully crafted antique vase.",
+    images: ["https://m.media-amazon.com/images/I/61su8yynVEL._SX679_.jpg","https://m.media-amazon.com/images/I/41oGOSIjk3L._SS100_.jpg","https://m.media-amazon.com/images/I/51sBGrG8azL._SS100_.jpg"],
+    category: ["Home Decor"],
+    auction_end: "2025-02-20T15:00:00Z",
+    price: "650",
+    rating: 4.8,
+    status: "active",
+  },
+  {
+    id: "4",
+    title: "Antique Vase",
+    description: "Beautifully crafted antique vase.",
+    images: ["https://m.media-amazon.com/images/I/61su8yynVEL._SX679_.jpg","https://m.media-amazon.com/images/I/41oGOSIjk3L._SS100_.jpg","https://m.media-amazon.com/images/I/51sBGrG8azL._SS100_.jpg"],
+    category: ["Home Decor"],
+    auction_end: "2025-02-20T15:00:00Z",
+    price: "650",
+    rating: 4.8,
+    status: "active",
+  },
 ];
+
+app.get("/api/items/recommended", (req, res) => {
+  const { limit = 16 } = req.query;
+  const shuffledItems = items.sort(() => 0.5 - Math.random());
+  const recommended = shuffledItems.slice(0, Math.min(limit, items.length));
+  res.json(recommended);
+});
 
 
 app.get("/api/items", (req, res) => {

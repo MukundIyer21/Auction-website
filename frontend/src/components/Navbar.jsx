@@ -2,8 +2,11 @@ import React,{useState} from 'react'
 import { FaBars, FaTimes } from "react-icons/fa";
 import logo from "./logo1.jpg"; 
 import { motion } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+
+const navigate=useNavigate();
 
 const [navOpen, setNavOpen] = useState(false);
 
@@ -31,7 +34,7 @@ const handleToggle = () => {
           <a href="#about" className="block py-2 px-4 hover:text-yellow-500 transition-colors">About</a>
         </li>
         <li className="text-lg my-2 md:my-0">
-          <a href="#auctions" className="block py-2 px-4 hover:text-yellow-500 transition-colors">Auctions</a>
+          <a href="#auctions" className="block py-2 px-4 hover:text-yellow-500 transition-colors" onClick={() => navigate("/auctions")}>Auctions</a>
         </li>
         <li className="text-lg my-2 md:my-0">
           <a href="#contact" className="block py-2 px-4 hover:text-yellow-500 transition-colors">Contact</a>
