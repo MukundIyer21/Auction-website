@@ -24,7 +24,7 @@ const AddProduct = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-white text-black min-h-screen flex flex-col items-center">
+      <div className="bg-white text-black  flex flex-col items-center">
         <motion.section
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}

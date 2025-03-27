@@ -28,7 +28,7 @@ const handleToggle = () => {
       {/* Menu Items */}
       <ul className={`md:flex md:space-x-6 absolute md:static bg-gray-100 w-full md:w-auto transition-all duration-300 ease-in-out ${navOpen ? "top-16 left-0" : "top-[-100%]"}`}>
         <li className="text-lg my-2 md:my-0">
-          <a href="#home" className="block py-2 px-4 hover:text-yellow-500 transition-colors">Home</a>
+          <a href="#home" className="block py-2 px-4 hover:text-yellow-500 transition-colors" onClick={()=>navigate("/")}>Home</a>
         </li>
         <li className="text-lg my-2 md:my-0">
           <a href="#about" className="block py-2 px-4 hover:text-yellow-500 transition-colors">About</a>
