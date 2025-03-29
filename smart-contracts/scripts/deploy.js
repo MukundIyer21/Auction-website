@@ -13,8 +13,8 @@ async function main() {
 
     console.log("Contract deployed at:", contract.address);
 
-    const envFilePath = path.resolve(__dirname, "../../server/.env");
-    const abiFilePath = path.resolve(__dirname, "../../server/abi/ItemManagement.json");
+    const envFilePath = path.resolve(__dirname, "../../blockchain API and worker/.env");
+    const abiFilePath = path.resolve(__dirname, "../../blockchain API and worker/abi/ItemManagement.json");
 
     updateEnvFile(envFilePath, contract.address);
 

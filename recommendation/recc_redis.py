@@ -17,6 +17,8 @@ from pymongo import MongoClient
 # Load environment variables
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
+REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_PORT = int(os.getenv("REDIS_PORT"))
 
 # Download necessary NLTK resources
 nltk.download('stopwords')
@@ -44,7 +46,7 @@ db = client["auction_db"]
 collection = db["items"]
 
 # Connect to Redis
-redis_client = redis.Redis(host='localhost', port=6380, db=0)
+redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
 
 def store_recommendations():
