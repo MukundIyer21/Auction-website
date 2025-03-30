@@ -1,7 +1,10 @@
 import express from "express";
 import { addJob } from "./bull";
+import { schedulerPort } from "./config";
 const app = express();
 app.use(express.json());
+
+const port = schedulerPort;
 
 app.post("/", async (req, res) => {
   try {
@@ -19,6 +22,6 @@ app.post("/", async (req, res) => {
   }
 });
 
-app.listen("3003", () => {
-  console.log("Server listening on port 3003");
+app.listen(port, () => {
+  console.log("Server listening on port", port);
 });

@@ -24,7 +24,7 @@ fn initialise_logger() {
 #[tokio::main]
 async fn main() -> std::io::Result<()> {
     let configurations = Config::from_env().expect("Failed to load configurations");
-
+    let app_port = configurations.app.port;
     let redis_client = web::Data::new(
         RedisClient::new(&configurations.redis_uri, 5)
             .await
@@ -64,7 +64,7 @@ async fn main() -> std::io::Result<()> {
 
     initialise_logger();
 
-    info!("Central server starting on port 8080...");
+    info!("Central server starting on app_port {}...", app_port);
 
     let server = HttpServer::new(move || {
         App::new()
@@ -89,9 +89,12 @@ async fn main() -> std::io::Result<()> {
             .app_data(blockchain_base_uri.clone())
             .app_data(transfer_scheduler_base_uri.clone())
     })
-    .bind(("127.0.0.1", 8080))?;
+    .bind((configurations.app.host, app_port))?;
 
-    info!("✅ Central server started successfully on port 8080");
+    info!(
+        "✅ Central server started successfully on app_port {}",
+        app_port
+    );
 
     server.run().await.expect("Error starting the server");
 

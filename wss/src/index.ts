@@ -1,7 +1,9 @@
 import { WebSocketServer } from "ws";
 import { UserManager } from "./UserManager";
 import { pubSubClient as redisClient } from "./redis";
+import dotenv from "dotenv";
 
+dotenv.config();
 const subscribeTransferChannel = async () => {
   await redisClient.subscribe("transfer", async (message) => {
     try {
@@ -20,8 +22,9 @@ const subscribeTransferChannel = async () => {
 };
 
 const main = async () => {
+  const PORT = Number(process.env.PORT);
   const wss = new WebSocketServer({
-    port: 3001,
+    port: PORT,
     verifyClient: (info, done) => {
       try {
         const queryParams = new URLSearchParams(info.req.url?.split("?")[1]);
@@ -54,7 +57,7 @@ const main = async () => {
   });
 
   await subscribeTransferChannel();
-  console.log("WebSocket server started on port 3001.");
+  console.log("WebSocket server started on port", PORT);
 };
 
 main();
