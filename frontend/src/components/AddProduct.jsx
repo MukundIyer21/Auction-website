@@ -3,8 +3,11 @@ import Navbar from "./Navbar";
 import { motion } from "framer-motion";
 
 const AddProduct = () => {
-  const [productName, setProductName] = useState("");
+  const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [basePrice, setBasePrice] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [images, setImages] = useState(Array(6).fill(null));
 
   const handleImageChange = (index, event) => {
@@ -24,7 +27,7 @@ const AddProduct = () => {
   return (
     <>
       <Navbar />
-      <div className="bg-white text-black  flex flex-col items-center">
+      <div className="bg-white text-black flex flex-col items-center">
         <motion.section
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -40,12 +43,12 @@ const AddProduct = () => {
           >
             <div className="mb-4">
               <label className="block text-left text-gray-700 font-semibold mb-2">
-                Product Name
+                Title
               </label>
               <input
                 type="text"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
                 required
               />
@@ -53,7 +56,7 @@ const AddProduct = () => {
 
             <div className="mb-4">
               <label className="block text-left text-gray-700 font-semibold mb-2">
-                Product Description
+                Description
               </label>
               <textarea
                 value={description}
@@ -62,6 +65,45 @@ const AddProduct = () => {
                 rows="4"
                 required
               ></textarea>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-left text-gray-700 font-semibold mb-2">
+                Category
+              </label>
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-left text-gray-700 font-semibold mb-2">
+                Base Price ($)
+              </label>
+              <input
+                type="number"
+                value={basePrice}
+                onChange={(e) => setBasePrice(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+                required
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-left text-gray-700 font-semibold mb-2">
+                Auction End Time
+              </label>
+              <input
+                type="datetime-local"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+                required
+              />
             </div>
 
             <div className="mb-4">
