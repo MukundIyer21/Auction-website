@@ -3,6 +3,7 @@ use core::fmt;
 use bb8_redis::redis::{cmd, AsyncCommands};
 use bb8_redis::{bb8, RedisConnectionManager};
 use serde::{de::DeserializeOwned, Serialize};
+use serde_json::to_string;
 
 use crate::types::{MessageToEnqueue, MessageToPublish};
 
@@ -68,8 +69,9 @@ impl RedisClient {
         channel: &str,
     ) -> Result<(), RedisClientError> {
         let mut conn = self.pool.get().await.map_err(RedisClientError::PoolError)?;
-
-        conn.publish::<_, _, i64>(channel, message.price)
+        let serialized_message =
+            to_string(&message).map_err(|_| return RedisClientError::SerializationError)?;
+        conn.publish::<_, _, i64>(channel, serialized_message)
             .await
             .map(|_| ())
             .map_err(RedisClientError::OperationError)

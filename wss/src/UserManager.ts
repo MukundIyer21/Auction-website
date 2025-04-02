@@ -39,7 +39,7 @@ export class UserManager {
   private async pushAllExistingItems(user: User, userId: string) {
     const itemsForUser = await this.getAllItemsForUser(userId);
     itemsForUser.map((item) => {
-      user.emit({ ...item, user_id: userId });
+      user.emit({ ...item, user_id: userId, type: "TRANSFER" });
     });
   }
 

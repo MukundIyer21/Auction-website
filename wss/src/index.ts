@@ -11,7 +11,7 @@ const subscribeTransferChannel = async () => {
       const user = UserManager.getInstance().getUser(parsedMessage.user_id);
 
       if (user) {
-        user.emit(parsedMessage);
+        user.emit({ ...parsedMessage, type: "TRANSFER" });
       } else {
         console.warn(`No user found for user_id: ${parsedMessage.user_id}`);
       }

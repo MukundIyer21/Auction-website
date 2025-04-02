@@ -33,7 +33,11 @@ export class SubscriptionManager {
 
   private redisCallbackHandler = async (message: string, channel: string) => {
     const parsedMessage = JSON.parse(message);
-    this.reverseSubscriptions.get(channel)?.forEach((s) => UserManager.getInstance().getUser(s)?.emit(parsedMessage));
+    this.reverseSubscriptions.get(channel)?.forEach((s) =>
+      UserManager.getInstance()
+        .getUser(s)
+        ?.emit({ ...parsedMessage, type: "BIDUPDATE" })
+    );
   };
 
   public async unsubscribe(userId: string, subscription: string) {

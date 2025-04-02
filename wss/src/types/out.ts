@@ -1,4 +1,5 @@
 type TransferMessages = {
+  type: "TRANSFER";
   user_id: string;
   item_id: string;
   item_name: string;
@@ -7,7 +8,7 @@ type TransferMessages = {
 };
 
 type BidUpdateMessages = {
-  item_id: string;
+  type: "BIDUPDATE";
   price: string;
 };
 

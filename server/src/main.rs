@@ -1,14 +1,10 @@
+use actix_cors::Cors;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use auction_server::{
     awss3::AWSClient,
     config::Config,
     elasticsearch::ElasticSearchClient,
-    handlers::{
-        autocomplete_item_handler, delete_item_handler, get_category_items_handler,
-        get_home_page_handler, get_item_handler, get_operation_status_handler,
-        get_top_categories_handler, get_user_items_handler, health_check_handler,
-        place_bid_handler, post_item_handler, search_item_handler, transfer_item_handler,
-    },
+    handlers::*,
     mongo::MongoClient,
     redis::RedisClient,
     types::{BlockchainAPIURI, TransferSchedulerURI},
@@ -25,6 +21,7 @@ fn initialise_logger() {
 async fn main() -> std::io::Result<()> {
     let configurations = Config::from_env().expect("Failed to load configurations");
     let app_port = configurations.app.port;
+
     let redis_client = web::Data::new(
         RedisClient::new(&configurations.redis_uri, 5)
             .await
@@ -69,6 +66,14 @@ async fn main() -> std::io::Result<()> {
     let server = HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .wrap(
+                Cors::default()
+                    .allow_any_origin()
+                    .allow_any_method()
+                    .allow_any_header()
+                    .supports_credentials()
+                    .max_age(3600),
+            )
             .service(health_check_handler)
             .service(post_item_handler)
             .service(get_item_handler)
