@@ -5,6 +5,52 @@ import apiService from "../utils/methods";
 import { SignalingManager } from "../utils/SignalingManager";
 import LoadingSpinner from "./Loading";
 
+const getUserItemsCache = () => {
+  const cacheKey = "smart-bid-user-items";
+
+  return {
+    set: function (userAddress, items) {
+      const cache = {
+        userAddress,
+        items,
+        timestamp: new Date().getTime(),
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(cache));
+    },
+
+    get: function (userAddress) {
+      try {
+        const cacheStr = localStorage.getItem(cacheKey);
+        if (!cacheStr) return null;
+
+        const cache = JSON.parse(cacheStr);
+        if (cache.userAddress !== userAddress) return null;
+
+        const now = new Date().getTime();
+        const expirationMs = 5 * 60 * 1000;
+
+        if (now - cache.timestamp > expirationMs) {
+          localStorage.removeItem(cacheKey);
+          return null;
+        }
+
+        return cache.items;
+      } catch (error) {
+        console.error("Error accessing cache:", error);
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+    },
+
+    isItemOwned: function (userAddress, itemId) {
+      const items = this.get(userAddress);
+      return items ? items.includes(itemId) : false;
+    },
+  };
+};
+
+const userItemsCache = getUserItemsCache();
+
 const ItemDetail = () => {
   const { id } = useParams();
   const [item, setItem] = useState(null);
@@ -13,6 +59,7 @@ const ItemDetail = () => {
   const [bidAmount, setBidAmount] = useState(0);
   const [similarItems, setSimilarItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
   const navigate = useNavigate();
   const intervalRef = useRef(null);
   const signalingManagerRef = useRef(null);
@@ -35,14 +82,42 @@ const ItemDetail = () => {
     toast.success(`Bid updated! New price: $${newPrice}`);
   };
 
+  const fetchUserItems = async () => {
+    const userAddress = localStorage.getItem("smartbid-address");
+    if (!userAddress) return [];
+
+    const cachedItems = userItemsCache.get(userAddress);
+    if (cachedItems) {
+      return cachedItems;
+    }
+
+    const [success, data] = await apiService.getUserItems(userAddress);
+
+    if (success && data.items) {
+      const itemIds = data.items.map((item) => item._id);
+      userItemsCache.set(userAddress, itemIds);
+      return itemIds;
+    }
+
+    return [];
+  };
+
   useEffect(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
 
-    const fetchItemDetails = async () => {
+    const fetchData = async () => {
       setLoading(true);
+
+      const userAddress = localStorage.getItem("smartbid-address");
+      if (userAddress) {
+        const userItemIds = await fetchUserItems();
+        const userOwnsItem = userItemIds.includes(id);
+        setIsOwner(userOwnsItem);
+      }
+
       const [success, data] = await apiService.getItem(id);
 
       if (success) {
@@ -117,7 +192,7 @@ const ItemDetail = () => {
       }
     };
 
-    fetchItemDetails();
+    fetchData();
 
     const userAddress = localStorage.getItem("smartbid-address");
     if (userAddress) {
@@ -152,7 +227,12 @@ const ItemDetail = () => {
     const userAddress = localStorage.getItem("smartbid-address");
 
     if (!userAddress) {
-      toast.error("Please login to place a bid");
+      toast.error("Please connect a wallet to proceed");
+      return;
+    }
+
+    if (isOwner || userItemsCache.isItemOwned(userAddress, id)) {
+      toast.error("You cannot bid on your own item!");
       return;
     }
 
@@ -252,7 +332,7 @@ const ItemDetail = () => {
           </p>
           <p className="text-lg font-semibold text-red-600">{timeLeft}</p>
 
-          {item.status === "ACTIVE" && (
+          {item.status === "ACTIVE" && !isOwner ? (
             <>
               {currentBidPrice === -1 ? (
                 <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-lg w-full transition-all" onClick={handleBidSubmit}>
@@ -275,7 +355,9 @@ const ItemDetail = () => {
                 </>
               )}
             </>
-          )}
+          ) : isOwner ? (
+            <div className="bg-yellow-100 text-yellow-800 p-3 rounded-lg text-center w-full border border-yellow-300">You own this item and cannot place bids on it</div>
+          ) : null}
         </div>
       </div>
 

@@ -12,6 +12,8 @@ import { SignalingManager } from "./utils/SignalingManager";
 import apiService from "./utils/methods";
 import { ethers } from "ethers";
 import SearchResults from "./components/SearchResult";
+import OperationTracker from "./components/OperationStatus";
+import UserItems from "./components/UserItems";
 
 const POLYGON_AMOY_PARAMS = {
   chainId: "0x13882",
@@ -178,8 +180,10 @@ function App() {
           <Route path="/auctions" element={<AuctionList />} />
           <Route path="/category/:categoryName" element={<CategoryItems />} />
           <Route path="/auction/:id" element={<ItemDetail />} />
-          <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/add-item" element={<AddProduct />} />
           <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/operation/status" element={<OperationTracker />} />
+          <Route path="/user/items" element={<UserItems />} />
         </Routes>
       </Router>
     </>

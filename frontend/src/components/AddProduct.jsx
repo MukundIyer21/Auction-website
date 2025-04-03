@@ -198,7 +198,7 @@ const AddProduct = () => {
                 className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
                 required
                 min="1"
-                max="336" // 2 weeks max
+                max="336"
                 disabled={isSubmitting}
               />
               <p className="text-sm text-gray-500 mt-1 text-left">Enter the number of hours your auction should run (max 336 hours / 2 weeks)</p>

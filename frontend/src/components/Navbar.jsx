@@ -39,7 +39,7 @@ const Navbar = () => {
           </p>
         </li>
         <li className="text-lg my-2 md:my-0">
-          <p className="cursor-pointer block py-2 px-4 hover:text-yellow-500 transition-colors" onClick={() => navigate("/operation")}>
+          <p className="cursor-pointer block py-2 px-4 hover:text-yellow-500 transition-colors" onClick={() => navigate("/operation/status")}>
             Operation Status
           </p>
         </li>

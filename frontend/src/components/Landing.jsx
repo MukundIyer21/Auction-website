@@ -51,7 +51,7 @@ const Landing = () => {
             <motion.button
               whileHover={{ scale: 1.1 }}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold text-lg mt-4 mb-4 mx-3 md:mt-6"
-              onClick={() => navigate("/add-product")}
+              onClick={() => navigate("/add-item")}
             >
               Add your product
             </motion.button>

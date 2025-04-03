@@ -83,7 +83,6 @@ def process_item():
 
         # Fetch item images from MongoDB
         item = items_collection.find_one({"_id": item_id})
-        print(item)
         if not item or "images" not in item:
             print(f"No images found for item {item_id}")
             continue
@@ -116,6 +115,9 @@ def process_item():
             {"_id": item_id},
             {"$set": {"rating": rating_str, "status": "ACTIVE"}}
         )
+
+        # Delete cached item from redis
+        redis_client.delete(f"item_details:{item_id}")
 
         print(
             f"Updated item {item_id} with rating {avg_rating} and status ACTIVE")
