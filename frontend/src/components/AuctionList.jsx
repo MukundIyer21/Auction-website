@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import apiService from "../utils/methods.js";
 import { toast } from "react-hot-toast";
+import LoadingSpinner from "./Loading.jsx";
 
 const AuctionList = () => {
   const [homeData, setHomeData] = useState([]);
@@ -34,7 +35,11 @@ const AuctionList = () => {
   }, []);
 
   if (loading) {
-    return <p className="text-center text-gray-600 p-8">Loading auction items...</p>;
+    return (
+      <div className="m-20">
+        <LoadingSpinner message="Loading Auction Items" size="large" />
+      </div>
+    );
   }
 
   return (
@@ -45,7 +50,7 @@ const AuctionList = () => {
             <h2 className="text-2xl font-bold mb-4 text-gray-800 capitalize">{categoryData.category}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
               {categoryData.items.map((item) => (
-                <div key={item._id} className="bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col h-80">
+                <div key={item._id} className="bg-white rounded-lg shadow-lg border border-gray-200 flex flex-col">
                   <div className="p-4 h-40 flex items-center justify-center">
                     <img src={item.images.length > 0 ? item.images[0] : "placeholder.jpg"} alt={item.title} className="max-h-full max-w-full object-contain rounded-md" />
                   </div>

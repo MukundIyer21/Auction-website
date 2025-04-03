@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import apiService from "../utils/methods";
+import LoadingSpinner from "./Loading";
 
 const CategoryItems = () => {
   const { categoryName } = useParams();
@@ -36,7 +37,11 @@ const CategoryItems = () => {
   }, [categoryName, navigate]);
 
   if (loading) {
-    return <p className="text-center text-gray-600">Loading...</p>;
+    return (
+      <div className="m-20">
+        <LoadingSpinner message="Loading Category Items" size="large" />
+      </div>
+    );
   }
 
   return (

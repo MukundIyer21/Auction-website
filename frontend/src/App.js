@@ -10,6 +10,8 @@ import CategoryItems from "./components/CategoryItems";
 import Navbar from "./components/Navbar";
 import { SignalingManager } from "./utils/SignalingManager";
 import apiService from "./utils/methods";
+import { ethers } from "ethers";
+import SearchResults from "./components/SearchResult";
 
 const POLYGON_AMOY_PARAMS = {
   chainId: "0x13882",
@@ -123,22 +125,20 @@ function App() {
         const buyerAddress = localStorage.getItem("smartbid-address");
         if (!buyerAddress) throw new Error("Wallet not connected");
 
-        const priceInWei = window.web3.utils.toWei(price.toString(), "ether");
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
 
-        await window.ethereum.request({
-          method: "eth_sendTransaction",
-          params: [
-            {
-              from: buyerAddress,
-              to: seller,
-              value: window.web3.utils.toHex(priceInWei),
-            },
-          ],
+        const transaction = await signer.sendTransaction({
+          to: seller,
+          value: ethers.parseEther(price.toString()),
         });
+
+        await transaction.wait();
 
         toast.success("Payment successful!");
         return true;
       } catch (error) {
+        console.error("Payment error:", error);
         throw new Error(error.message || "Payment failed");
       }
     }
@@ -179,6 +179,7 @@ function App() {
           <Route path="/category/:categoryName" element={<CategoryItems />} />
           <Route path="/auction/:id" element={<ItemDetail />} />
           <Route path="/add-product" element={<AddProduct />} />
+          <Route path="/search-results" element={<SearchResults />} />
         </Routes>
       </Router>
     </>

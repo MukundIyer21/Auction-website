@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import apiService from "../utils/methods";
 import { SignalingManager } from "../utils/SignalingManager";
+import LoadingSpinner from "./Loading";
 
 const ItemDetail = () => {
   const { id } = useParams();
@@ -103,7 +104,7 @@ const ItemDetail = () => {
             const hours = Math.floor(difference / (1000 * 60 * 60));
             const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-            setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+            setTimeLeft(`Auction Will End In : ${hours}: ${minutes} : ${seconds}`);
           }
         };
 
@@ -202,7 +203,11 @@ const ItemDetail = () => {
   };
 
   if (loading) {
-    return <p className="text-center text-black">Loading item details...</p>;
+    return (
+      <div className="m-20">
+        <LoadingSpinner message="Loading Item Details" size="large" />
+      </div>
+    );
   }
 
   if (!item) {
@@ -245,7 +250,7 @@ const ItemDetail = () => {
           <p className="text-lg font-semibold text-gray-700">
             Status: <span className={item.status === "ACTIVE" ? "text-green-600" : "text-red-600"}>{item.status}</span>
           </p>
-          <p className="text-lg font-semibold text-red-600">Auction will end in: {timeLeft}</p>
+          <p className="text-lg font-semibold text-red-600">{timeLeft}</p>
 
           {item.status === "ACTIVE" && (
             <>
