@@ -10,9 +10,8 @@ const CategoryItems = () => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const convertRatingToNumber = (rating) => {
-    const ratingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
-    return ratingMap[rating] || 0;
+  const convertRating = (rating) => {
+    return rating === -1.0 ? "PENDING" : rating.toString();
   };
 
   const truncateString = (str, maxLength) => {
@@ -59,7 +58,7 @@ const CategoryItems = () => {
               <img src={item.images.length > 0 ? item.images[0] : "placeholder.jpg"} alt={item.title} className="w-full h-40 object-contain rounded-md" />
               <h2 className="text-xl font-bold mt-2 text-gray-800 capitalize">{item.title}</h2>
               <p className="text-gray-600 mb-2 capitalize">{truncateString(item.description, 32)}</p>
-              <p className="text-lg font-semibold mb-4 text-gray-700">Rating: ⭐ {convertRatingToNumber(item.rating)}</p>
+              <p className="text-lg font-semibold mb-4 text-gray-700">Rating: ⭐ {convertRating(item.rating)}</p>
               <button className="bg-blue-600 hover:bg-blue-700 hover:scale-105 text-white px-4 py-2 rounded w-full transition-all" onClick={() => navigate(`/auction/${item._id}`)}>
                 More Info
               </button>

@@ -6,16 +6,6 @@ use serde::{Deserialize, Serialize};
 use std::string::ToString;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub enum Rating {
-    PENDING,
-    ONE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-}
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ItemStatus {
     PENDING,
     ACTIVE,
@@ -36,19 +26,6 @@ impl ToString for ItemStatus {
     }
 }
 
-impl ToString for Rating {
-    fn to_string(&self) -> String {
-        match self {
-            Rating::PENDING => "PENDING".to_string(),
-            Rating::ONE => "ONE".to_string(),
-            Rating::TWO => "TWO".to_string(),
-            Rating::THREE => "THREE".to_string(),
-            Rating::FOUR => "FOUR".to_string(),
-            Rating::FIVE => "FIVE".to_string(),
-        }
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Item {
     #[serde(rename = "_id", skip_serializing_if = "Option::is_none")]
@@ -58,7 +35,7 @@ pub struct Item {
     pub images: Vec<String>,
     pub category: String,
     pub auction_end: DateTime,
-    pub rating: Rating,
+    pub rating: f64,
     pub status: ItemStatus,
     pub base_price: f64,
 }

@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     awss3::AWSClient,
     elasticsearch::ElasticSearchClient,
-    mongo::{Item, ItemStatus, MongoClient, Rating},
+    mongo::{Item, ItemStatus, MongoClient},
     redis::RedisClient,
     types::{BlockchainAPIURI, MessageToEnqueue, TransferSchedulerURI},
 };
@@ -220,7 +220,7 @@ pub async fn post_item_handler(
                 images: image_urls,
                 category: req.item_details.category.clone().to_lowercase(),
                 auction_end,
-                rating: Rating::PENDING,
+                rating: -1.0,
                 status: ItemStatus::PENDING,
                 base_price: req.item_details.base_price,
             };

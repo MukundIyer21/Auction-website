@@ -88,7 +88,7 @@ pub async fn get_top_categories_handler(
                 &cache_prefix,
                 &cache_key.to_string(),
                 &top_categories,
-                Some(180),
+                Some(60),
             )
             .await
             .ok();

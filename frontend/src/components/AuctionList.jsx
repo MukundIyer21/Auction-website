@@ -9,9 +9,8 @@ const AuctionList = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  const convertRatingToNumber = (rating) => {
-    const ratingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
-    return ratingMap[rating] || 0;
+  const convertRating = (rating) => {
+    return rating === -1.0 ? "PENDING" : rating.toString();
   };
 
   const truncateString = (str, maxLength) => {
@@ -57,7 +56,7 @@ const AuctionList = () => {
                   <div className="p-4 flex-1 flex flex-col">
                     <h2 className="text-lg font-bold text-gray-800 capitalize truncate">{item.title}</h2>
                     <p className="text-gray-600 text-sm mb-2 overflow-hidden line-clamp-2">{truncateString(item.description, 32)}</p>
-                    <p className="text-sm font-semibold text-gray-700 mt-auto">Rating : ⭐ {convertRatingToNumber(item.rating)} </p>
+                    <p className="text-sm font-semibold text-gray-700 mt-auto">Rating : ⭐ {convertRating(item.rating)} </p>
                     <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full mt-2 transition-all" onClick={() => navigate(`/auction/${item._id}`)}>
                       More Info
                     </button>

@@ -26,14 +26,7 @@ print(MONGO_URI)
 db_client = pymongo.MongoClient(MONGO_URI)
 db = db_client["auction_db"]
 items_collection = db["items"]
-# Dict to convert interger ratings into String
-rating_dict = {
-    1: "ONE",
-    2: "TWO",
-    3: "THREE",
-    4: "FOUR",
-    5: "FIVE",
-}
+
 
 # Load pre-trained ResNet-50 model
 model = models.resnet50()
@@ -106,14 +99,16 @@ def process_item():
                 ratings.append(rating)
 
         avg_rating = sum(ratings) / len(ratings)
-        # Ensure rating is between 1 and 5
-        rounded_rating = max(1, min(5, round(avg_rating)))
-        rating_str = rating_dict.get(rounded_rating, "UNKNOWN")
+        
+    
+        rating = max(1, min(5, avg_rating))
+
+        rounded_rating = round(rating , 1)
 
         # Update database with rating and set status as ACTIVE
         items_collection.update_one(
             {"_id": item_id},
-            {"$set": {"rating": rating_str, "status": "ACTIVE"}}
+            {"$set": {"rating": rounded_rating, "status": "ACTIVE"}}
         )
 
         # Delete cached item from redis

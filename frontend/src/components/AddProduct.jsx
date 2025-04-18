@@ -115,7 +115,7 @@ const AddProduct = () => {
             { duration: 120000 }
           );
         }
-
+        localStorage.removeItem("smart-bid-user-items");
         navigate(`/auction/${response.item_id}`);
       } else {
         toast.error(`Failed to add product: ${response}`);

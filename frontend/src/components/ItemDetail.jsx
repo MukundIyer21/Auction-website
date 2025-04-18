@@ -64,9 +64,8 @@ const ItemDetail = () => {
   const intervalRef = useRef(null);
   const signalingManagerRef = useRef(null);
 
-  const convertRatingToNumber = (rating) => {
-    const ratingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
-    return ratingMap[rating] || 0;
+  const convertRating = (rating) => {
+    return rating === -1.0 ? "PENDING" : rating.toString();
   };
 
   const handleBidUpdate = (newPrice) => {
@@ -326,7 +325,7 @@ const ItemDetail = () => {
           <p className="text-lg font-semibold text-gray-800">
             Current Price: <span className="text-green-600">{currentBidPrice !== -1 ? `$ ${currentBidPrice}` : "No bids yet"}</span>
           </p>
-          <p className="text-lg font-semibold text-gray-700">Rating: ⭐ {convertRatingToNumber(item.rating)}</p>
+          <p className="text-lg font-semibold text-gray-700">Rating: ⭐ {convertRating(item.rating)}</p>
           <p className="text-lg font-semibold text-gray-700">
             Status: <span className={item.status === "ACTIVE" ? "text-green-600" : "text-red-600"}>{item.status}</span>
           </p>
