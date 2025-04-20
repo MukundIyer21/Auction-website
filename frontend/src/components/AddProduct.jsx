@@ -4,6 +4,55 @@ import { motion } from "framer-motion";
 import apiService from "../utils/methods";
 import { toast } from "react-hot-toast";
 
+const getUserItemsCache = () => {
+  const cacheKey = "smart-bid-user-items";
+
+  return {
+    set: function (userAddress, items) {
+      const cache = {
+        userAddress,
+        items,
+        timestamp: new Date().getTime(),
+      };
+      localStorage.setItem(cacheKey, JSON.stringify(cache));
+    },
+
+    get: function (userAddress) {
+      try {
+        const cacheStr = localStorage.getItem(cacheKey);
+        if (!cacheStr) return null;
+
+        const cache = JSON.parse(cacheStr);
+        if (cache.userAddress !== userAddress) return null;
+
+        const now = new Date().getTime();
+        const expirationMs = 5 * 60 * 1000;
+
+        if (now - cache.timestamp > expirationMs) {
+          localStorage.removeItem(cacheKey);
+          return null;
+        }
+
+        return cache.items;
+      } catch (error) {
+        console.error("Error accessing cache:", error);
+        localStorage.removeItem(cacheKey);
+        return null;
+      }
+    },
+
+    addItem: function (userAddress, itemId) {
+      const items = this.get(userAddress) || [];
+      if (!items.includes(itemId)) {
+        items.push(itemId);
+        this.set(userAddress, items);
+      }
+    },
+  };
+};
+
+const userItemsCache = getUserItemsCache();
+
 const AddProduct = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
@@ -115,7 +164,11 @@ const AddProduct = () => {
             { duration: 120000 }
           );
         }
-        localStorage.removeItem("smart-bid-user-items");
+
+        if (response && response.item_id) {
+          userItemsCache.addItem(sellerAddress, response.item_id);
+        }
+
         navigate(`/auction/${response.item_id}`);
       } else {
         toast.error(`Failed to add product: ${response}`);

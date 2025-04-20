@@ -71,7 +71,7 @@ const Landing = () => {
                   <motion.div
                     key={index}
                     className="bg-gray-200 text-center p-4 mx-4 rounded-lg cursor-pointer"
-                    onClick={() => navigate(`/category/${typeof category === "string" ? category.toLowerCase().replace(/ /g, "-") : category}`)}
+                    onClick={() => navigate(`/category/${typeof category === "string" ? category.toLowerCase() : category}`)}
                   >
                     <h3 className="text-xl font-semibold text-blue-600 capitalize">{typeof category === "string" ? category : category}</h3>
                   </motion.div>

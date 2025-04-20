@@ -13,9 +13,8 @@ const UserItems = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const navigate = useNavigate();
 
-  const convertRatingToNumber = (rating) => {
-    const ratingMap = { ONE: 1, TWO: 2, THREE: 3, FOUR: 4, FIVE: 5 };
-    return ratingMap[rating] || 0;
+  const convertRating = (rating) => {
+    return rating === -1.0 ? "PENDING" : rating.toString();
   };
 
   const truncateString = (str, maxLength) => {
@@ -109,7 +108,7 @@ const UserItems = () => {
             { duration: 7000 }
           );
 
-          navigate("/operations");
+          navigate("/auctions");
         }
       } else {
         toast.error(`Failed to delete item: ${response}`);
@@ -211,7 +210,7 @@ const UserItems = () => {
 
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-500">Rating</span>
-                    <span className="font-medium">⭐ {convertRatingToNumber(item.rating)}</span>
+                    <span className="font-medium">⭐ {convertRating(item.rating)}</span>
                   </div>
 
                   <div className="flex pt-3 gap-2">

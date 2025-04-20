@@ -48,7 +48,7 @@ const CategoryItems = () => {
       <button className="mb-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg" onClick={() => navigate("/")}>
         Back to Categories
       </button>
-      <h2 className="text-2xl font-bold mb-4 text-gray-800 capitalize">{categoryName.replace(/-/g, " ")}</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800 capitalize">{categoryName}</h2>
       {items.length === 0 ? (
         <p className="text-center text-gray-600">No items found in this category.</p>
       ) : (

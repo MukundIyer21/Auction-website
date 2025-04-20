@@ -60,6 +60,7 @@ const ItemDetail = () => {
   const [similarItems, setSimilarItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const [mainImageIndex, setMainImageIndex] = useState(0);
   const navigate = useNavigate();
   const intervalRef = useRef(null);
   const signalingManagerRef = useRef(null);
@@ -305,10 +306,16 @@ const ItemDetail = () => {
     <>
       <div className="bg-white text-black px-20 py-10 flex flex-col lg:flex-row justify-evenly">
         <div className="flex flex-col items-center lg:items-start lg:w-1/2 space-y-4">
-          <img src={item.images?.[0] || "placeholder.jpg"} alt="Main Item" className="w-96 h-80 object-cover rounded-lg shadow-lg border border-gray-300" />
+          <img src={item.images?.[mainImageIndex] || "placeholder.jpg"} alt="Main Item" className="w-96 h-80 object-cover rounded-lg shadow-lg border border-gray-300" />
           <div className="flex space-x-2">
-            {item.images?.slice(1).map((img, index) => (
-              <img key={index} src={img} alt={`Item ${index + 1}`} className="w-24 h-20 object-cover rounded-lg shadow-md border border-gray-300" />
+            {item.images?.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Item ${index + 1}`}
+                className={`w-24 h-20 object-cover rounded-lg shadow-md border cursor-pointer transition-all ${mainImageIndex === index ? "border-blue-500 border-2" : "border-gray-300"}`}
+                onClick={() => setMainImageIndex(index)}
+              />
             ))}
           </div>
         </div>
