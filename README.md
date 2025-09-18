@@ -6,7 +6,7 @@ The system leverages **deep learning (ResNet-50)** for automated damage detectio
 
 ---
 
-## 🚀 Features  
+## Features  
 
 - **AI-powered Damage Detection**  
   - Uses ResNet-50 CNN to analyze item images.  
@@ -33,7 +33,7 @@ The system leverages **deep learning (ResNet-50)** for automated damage detectio
 
 ---
 
-## 🛠️ Tech Stack  
+## 🛠Tech Stack  
 
 **Frontend:** React.js, Axios, WebSockets  
 **Backend:** Rust (Actix-web), Node.js (Express.js), Redis, BullMQ  
@@ -44,7 +44,7 @@ The system leverages **deep learning (ResNet-50)** for automated damage detectio
 
 ---
 
-## 📊 Results  
+## Results  
 
 - **ResNet-50 achieved the best performance** with an F1-score of **0.86** at 30 epochs (LR = 0.001).  
 - Compared against **GoogleNet** and **YOLOv8**, ResNet-50 provided superior precision/recall for damage detection.  
